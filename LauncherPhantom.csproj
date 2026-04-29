@@ -16,6 +16,7 @@
     <PublishReadyToRun>false</PublishReadyToRun>
     <Nullable>enable</Nullable>
     <LangVersion>12</LangVersion>
+    <ApplicationIcon>Resources\Images\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,6 +28,10 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources/**/*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources/Images/icon.ico" />
   </ItemGroup>
 
 </Project>

@@ -12,7 +12,7 @@
         WindowStyle="SingleBorderWindow"
         ResizeMode="CanResize"
         AllowsTransparency="False"
-        Icon="pack://application:,,,/Resources/Images/icon.png">
+        Icon="pack://application:,,,/Resources/Images/icon.ico">
     
     <Grid>
         <!-- Main Frame for navigation (base layer) -->
