@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using Newtonsoft.Json;
 using LauncherPhantom.Models;
 
@@ -36,6 +37,7 @@ namespace LauncherPhantom.Managers
         private AuthManager()
         {
             _httpClient = new HttpClient();
+            Debug.WriteLine("[AuthManager] Inicializado");
         }
 
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
@@ -45,11 +47,15 @@ namespace LauncherPhantom.Managers
                 var serverUrl = ConfigManager.Instance.GetSetting("server_url") ?? "http://localhost:5000";
                 var endpoint = $"{serverUrl}/api/auth/login";
 
+                Debug.WriteLine($"[AuthManager] Enviando login a: {endpoint}");
+
                 var json = JsonConvert.SerializeObject(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                 var response = await _httpClient.PostAsync(endpoint, content);
                 var responseContent = await response.Content.ReadAsStringAsync();
+
+                Debug.WriteLine($"[AuthManager] Respuesta status: {response.StatusCode}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -62,6 +68,7 @@ namespace LauncherPhantom.Managers
                         ConfigManager.Instance.SetSetting("jwt_token", 
                             EncryptionManager.Instance.Encrypt(authResponse.Token));
                         
+                        Debug.WriteLine("[AuthManager] Token guardado");
                         return authResponse;
                     }
                 }
@@ -71,6 +78,7 @@ namespace LauncherPhantom.Managers
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"[AuthManager] Error en LoginAsync: {ex.Message}");
                 return new AuthResponse { Success = false, Error = $"Error de conexión: {ex.Message}" };
             }
         }
@@ -82,17 +90,22 @@ namespace LauncherPhantom.Managers
                 var serverUrl = ConfigManager.Instance.GetSetting("server_url") ?? "http://localhost:5000";
                 var endpoint = $"{serverUrl}/api/auth/register";
 
+                Debug.WriteLine($"[AuthManager] Enviando registro a: {endpoint}");
+
                 var json = JsonConvert.SerializeObject(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                 var response = await _httpClient.PostAsync(endpoint, content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
+                Debug.WriteLine($"[AuthManager] Respuesta status: {response.StatusCode}");
+
                 return JsonConvert.DeserializeObject<AuthResponse>(responseContent) 
                     ?? new AuthResponse { Success = false, Error = "Error desconocido" };
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"[AuthManager] Error en RegisterAsync: {ex.Message}");
                 return new AuthResponse { Success = false, Error = $"Error de conexión: {ex.Message}" };
             }
         }
@@ -114,6 +127,7 @@ namespace LauncherPhantom.Managers
         {
             _jwtToken = null;
             ConfigManager.Instance.DeleteSetting("jwt_token");
+            Debug.WriteLine("[AuthManager] Sesión cerrada");
         }
     }
 }

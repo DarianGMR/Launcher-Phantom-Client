@@ -1,6 +1,7 @@
 using System;
 using System.Data.SQLite;
 using System.IO;
+using System.Diagnostics;
 
 namespace LauncherPhantom.Managers
 {
@@ -41,19 +42,29 @@ namespace LauncherPhantom.Managers
                     "Phantom");
 
                 if (!Directory.Exists(appDataPath))
+                {
                     Directory.CreateDirectory(appDataPath);
+                    Debug.WriteLine($"[DatabaseManager] Carpeta creada: {appDataPath}");
+                }
 
                 var dbPath = Path.Combine(appDataPath, "launcher.db");
                 _connectionString = $"Data Source={dbPath};Version=3;";
 
+                Debug.WriteLine($"[DatabaseManager] Conectando a: {dbPath}");
+                
                 _connection = new SQLiteConnection(_connectionString);
                 _connection.Open();
 
+                Debug.WriteLine("[DatabaseManager] Conexión abierta correctamente");
+
                 CreateTables();
+                
+                Debug.WriteLine("[DatabaseManager] Base de datos inicializada");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Database initialization error: {ex.Message}");
+                Debug.WriteLine($"[DatabaseManager] Error en Initialize: {ex.Message}");
+                Debug.WriteLine($"[DatabaseManager] StackTrace: {ex.StackTrace}");
             }
         }
 
@@ -72,6 +83,7 @@ namespace LauncherPhantom.Managers
                             CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
                         )";
                     cmd.ExecuteNonQuery();
+                    Debug.WriteLine("[DatabaseManager] Tabla 'Cache' creada/verificada");
 
                     // Create logs table
                     cmd.CommandText = @"
@@ -82,18 +94,27 @@ namespace LauncherPhantom.Managers
                             Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
                         )";
                     cmd.ExecuteNonQuery();
+                    Debug.WriteLine("[DatabaseManager] Tabla 'Logs' creada/verificada");
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error creating tables: {ex.Message}");
+                Debug.WriteLine($"[DatabaseManager] Error creando tablas: {ex.Message}");
             }
         }
 
         public void Dispose()
         {
-            _connection?.Close();
-            _connection?.Dispose();
+            try
+            {
+                _connection?.Close();
+                _connection?.Dispose();
+                Debug.WriteLine("[DatabaseManager] Conexión cerrada");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[DatabaseManager] Error en Dispose: {ex.Message}");
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace LauncherPhantom.Managers
 {
@@ -33,21 +34,28 @@ namespace LauncherPhantom.Managers
         {
             try
             {
-                var soundPath = System.IO.Path.Combine(
-                    System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "",
+                var soundPath = Path.Combine(
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "",
                     "Resources", $"{soundName}.wav");
+
+                Debug.WriteLine($"[SoundManager] Buscando sonido en: {soundPath}");
 
                 if (File.Exists(soundPath))
                 {
                     using (var soundPlayer = new System.Media.SoundPlayer(soundPath))
                     {
                         soundPlayer.PlaySync();
+                        Debug.WriteLine($"[SoundManager] Sonido reproducido: {soundName}");
                     }
                 }
+                else
+                {
+                    Debug.WriteLine($"[SoundManager] Archivo de sonido no encontrado: {soundPath}");
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                // Silent fail if sound doesn't play
+                Debug.WriteLine($"[SoundManager] Error reproduciendo sonido: {ex.Message}");
             }
         }
 
@@ -58,9 +66,9 @@ namespace LauncherPhantom.Managers
                 var task = new System.Threading.Tasks.Task(() => PlaySound(soundName));
                 task.Start();
             }
-            catch
+            catch (Exception ex)
             {
-                // Silent fail
+                Debug.WriteLine($"[SoundManager] Error en PlaySoundAsync: {ex.Message}");
             }
         }
     }

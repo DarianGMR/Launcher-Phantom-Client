@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Diagnostics;
 using Newtonsoft.Json;
 
 namespace LauncherPhantom.Managers
@@ -12,6 +13,7 @@ namespace LauncherPhantom.Managers
 
         private Dictionary<string, string> _config = new();
         private string _configPath = "";
+        private string _appDataPath = "";
 
         public static ConfigManager Instance
         {
@@ -33,14 +35,25 @@ namespace LauncherPhantom.Managers
 
         private ConfigManager()
         {
-            var appDataPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Phantom");
+            try
+            {
+                _appDataPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "Phantom");
 
-            if (!Directory.Exists(appDataPath))
-                Directory.CreateDirectory(appDataPath);
+                if (!Directory.Exists(_appDataPath))
+                {
+                    Directory.CreateDirectory(_appDataPath);
+                    Debug.WriteLine($"[ConfigManager] Carpeta creada: {_appDataPath}");
+                }
 
-            _configPath = Path.Combine(appDataPath, "config.json");
+                _configPath = Path.Combine(_appDataPath, "config.json");
+                Debug.WriteLine($"[ConfigManager] Config path: {_configPath}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[ConfigManager] Error en constructor: {ex.Message}");
+            }
         }
 
         public void LoadConfig()
@@ -52,36 +65,72 @@ namespace LauncherPhantom.Managers
                     var json = File.ReadAllText(_configPath);
                     _config = JsonConvert.DeserializeObject<Dictionary<string, string>>(json) 
                         ?? new Dictionary<string, string>();
+                    
+                    Debug.WriteLine($"[ConfigManager] Config cargada desde {_configPath}");
                 }
                 else
                 {
-                    _config = new Dictionary<string, string>();
+                    Debug.WriteLine("[ConfigManager] Config no existe, creando default...");
+                    _config = new Dictionary<string, string>
+                    {
+                        { "server_url", "http://localhost:5000" },
+                        { "language", "es" },
+                        { "theme", "dark" }
+                    };
                     SaveConfig();
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine($"[ConfigManager] Error cargando config: {ex.Message}");
                 _config = new Dictionary<string, string>();
             }
         }
 
         public string? GetSetting(string key)
         {
-            if (_config.TryGetValue(key, out var value))
-                return value;
-            return null;
+            try
+            {
+                if (_config.TryGetValue(key, out var value))
+                {
+                    Debug.WriteLine($"[ConfigManager] Get: {key} = {value}");
+                    return value;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[ConfigManager] Error en GetSetting: {ex.Message}");
+                return null;
+            }
         }
 
         public void SetSetting(string key, string value)
         {
-            _config[key] = value;
-            SaveConfig();
+            try
+            {
+                _config[key] = value;
+                SaveConfig();
+                Debug.WriteLine($"[ConfigManager] Set: {key} = {value}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[ConfigManager] Error en SetSetting: {ex.Message}");
+            }
         }
 
         public void DeleteSetting(string key)
         {
-            _config.Remove(key);
-            SaveConfig();
+            try
+            {
+                _config.Remove(key);
+                SaveConfig();
+                Debug.WriteLine($"[ConfigManager] Deleted: {key}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[ConfigManager] Error en DeleteSetting: {ex.Message}");
+            }
         }
 
         private void SaveConfig()
@@ -90,10 +139,11 @@ namespace LauncherPhantom.Managers
             {
                 var json = JsonConvert.SerializeObject(_config, Formatting.Indented);
                 File.WriteAllText(_configPath, json);
+                Debug.WriteLine($"[ConfigManager] Config guardada en {_configPath}");
             }
-            catch
+            catch (Exception ex)
             {
-                // Silent fail
+                Debug.WriteLine($"[ConfigManager] Error guardando config: {ex.Message}");
             }
         }
     }

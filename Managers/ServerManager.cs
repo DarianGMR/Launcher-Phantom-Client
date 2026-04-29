@@ -1,8 +1,10 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using Newtonsoft.Json;
 using LauncherPhantom.Models;
+using System.IO;
 
 namespace LauncherPhantom.Managers
 {
@@ -35,12 +37,14 @@ namespace LauncherPhantom.Managers
         private ServerManager()
         {
             _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+            Debug.WriteLine("[ServerManager] Inicializado");
         }
 
         public void SetServerUrl(string url)
         {
             _serverUrl = url;
             ConfigManager.Instance.SetSetting("server_url", url);
+            Debug.WriteLine($"[ServerManager] URL actualizada: {url}");
         }
 
         public async Task<bool> TestConnectionAsync()
@@ -48,11 +52,17 @@ namespace LauncherPhantom.Managers
             try
             {
                 _serverUrl = ConfigManager.Instance.GetSetting("server_url") ?? "http://localhost:5000";
+                Debug.WriteLine($"[ServerManager] Probando conexión a: {_serverUrl}");
+                
                 var response = await _httpClient.GetAsync($"{_serverUrl}/health");
-                return response.IsSuccessStatusCode;
+                bool isSuccess = response.IsSuccessStatusCode;
+                
+                Debug.WriteLine($"[ServerManager] Conexión resultado: {(isSuccess ? "OK" : "FALLO")}");
+                return isSuccess;
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine($"[ServerManager] Error en TestConnectionAsync: {ex.Message}");
                 return false;
             }
         }
@@ -61,17 +71,24 @@ namespace LauncherPhantom.Managers
         {
             try
             {
+                Debug.WriteLine("[ServerManager] Obteniendo versión...");
+                
                 var response = await _httpClient.GetAsync($"{_serverUrl}/api/launcher/version");
                 var content = await response.Content.ReadAsStringAsync();
                 
                 if (response.IsSuccessStatusCode)
                 {
-                    return JsonConvert.DeserializeObject<VersionInfo>(content);
+                    var versionInfo = JsonConvert.DeserializeObject<VersionInfo>(content);
+                    Debug.WriteLine($"[ServerManager] Versión obtenida: {versionInfo?.Version}");
+                    return versionInfo;
                 }
+                
+                Debug.WriteLine("[ServerManager] Error obteniendo versión");
                 return null;
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine($"[ServerManager] Error en GetVersionAsync: {ex.Message}");
                 return null;
             }
         }
@@ -80,9 +97,11 @@ namespace LauncherPhantom.Managers
         {
             try
             {
-                var downloadPath = System.IO.Path.Combine(
-                    System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
+                var downloadPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                     "Phantom", "launcher-update.exe");
+
+                Debug.WriteLine($"[ServerManager] Descargando desde: {fileUrl}");
 
                 using (var response = await _httpClient.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead))
                 {
@@ -92,7 +111,7 @@ namespace LauncherPhantom.Managers
                     var canReportProgress = totalBytes != 0;
 
                     using (var contentStream = await response.Content.ReadAsStreamAsync())
-                    using (var fileStream = System.IO.File.Create(downloadPath))
+                    using (var fileStream = File.Create(downloadPath))
                     {
                         var totalRead = 0L;
                         var buffer = new byte[8192];
@@ -110,11 +129,13 @@ namespace LauncherPhantom.Managers
                         }
                     }
 
+                    Debug.WriteLine($"[ServerManager] Descarga completada: {downloadPath}");
                     return downloadPath;
                 }
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"[ServerManager] Error en DownloadFileAsync: {ex.Message}");
                 throw new Exception($"Error descargando archivo: {ex.Message}");
             }
         }

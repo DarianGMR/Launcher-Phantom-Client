@@ -32,25 +32,33 @@ namespace LauncherPhantom.Managers
         {
             try
             {
+                Debug.WriteLine("[UpdateManager] Verificando actualizaciones...");
+                
                 var versionInfo = await ServerManager.Instance.GetVersionAsync();
                 if (versionInfo == null)
                     return (false, null);
 
-                var currentVersion = new Version(Constants.AppVersion);
+                var currentVersion = new Version(Models.Constants.AppVersion);
                 var newVersion = new Version(versionInfo.Version);
 
-                return (newVersion > currentVersion, versionInfo);
+                bool hasUpdate = newVersion > currentVersion;
+                Debug.WriteLine($"[UpdateManager] Versión actual: {currentVersion}, Nueva: {newVersion}, Tiene update: {hasUpdate}");
+                
+                return (hasUpdate, versionInfo);
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine($"[UpdateManager] Error: {ex.Message}");
                 return (false, null);
             }
         }
 
-        public async Task<string> DownloadUpdateAsync(VersionInfo versionInfo, Action<int> progressCallback)
+        public async Task<string> DownloadUpdateAsync(VersionInfo versionInfo, Action<int>? progressCallback)
         {
             try
             {
+                Debug.WriteLine("[UpdateManager] Descargando actualización...");
+                
                 var progress = new Progress<long>();
                 var progressReporter = progress as IProgress<long>;
 
@@ -65,6 +73,7 @@ namespace LauncherPhantom.Managers
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"[UpdateManager] Error: {ex.Message}");
                 throw new Exception($"Error descargando actualización: {ex.Message}");
             }
         }
@@ -73,6 +82,8 @@ namespace LauncherPhantom.Managers
         {
             try
             {
+                Debug.WriteLine($"[UpdateManager] Aplicando actualización: {installerPath}");
+                
                 var processInfo = new ProcessStartInfo
                 {
                     FileName = installerPath,
@@ -85,6 +96,7 @@ namespace LauncherPhantom.Managers
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"[UpdateManager] Error: {ex.Message}");
                 throw new Exception($"Error aplicando actualización: {ex.Message}");
             }
         }

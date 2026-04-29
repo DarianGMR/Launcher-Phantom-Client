@@ -1,6 +1,7 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Diagnostics;
 
 namespace LauncherPhantom.Managers
 {
@@ -41,8 +42,9 @@ namespace LauncherPhantom.Managers
                 var encryptedBytes = ProtectedData.Protect(plainTextBytes, null, DataProtectionScope.CurrentUser);
                 return Convert.ToBase64String(encryptedBytes);
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine($"[EncryptionManager] Error en Encrypt: {ex.Message}");
                 return plainText;
             }
         }
@@ -61,8 +63,9 @@ namespace LauncherPhantom.Managers
                 var plainTextBytes = ProtectedData.Unprotect(cipherTextBytes, null, DataProtectionScope.CurrentUser);
                 return Encoding.UTF8.GetString(plainTextBytes);
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine($"[EncryptionManager] Error en Decrypt: {ex.Message}");
                 return cipherText;
             }
         }
