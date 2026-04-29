@@ -1,5 +1,7 @@
+using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Diagnostics;
 using LauncherPhantom.Views;
 using LauncherPhantom.Managers;
 
@@ -9,44 +11,82 @@ namespace LauncherPhantom
     {
         public MainWindow()
         {
-            InitializeComponent();
-            
-            Loaded += async (s, e) =>
+            try
             {
-                await InitializeAsync();
-            };
+                InitializeComponent();
+                
+                Loaded += async (s, e) =>
+                {
+                    await InitializeAsync();
+                };
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[MainWindow] Error en constructor: {ex.Message}");
+                MessageBox.Show($"Error inicializando ventana: {ex.Message}");
+            }
         }
 
         private async System.Threading.Tasks.Task InitializeAsync()
         {
             try
             {
+                Debug.WriteLine("[MainWindow] Iniciando InitializeAsync...");
+                
                 // Show loading
                 ShowLoading(true);
+                Debug.WriteLine("[MainWindow] Loading mostrado");
 
-                // Initialize services
-                await ServerManager.Instance.TestConnectionAsync();
-
+                // Test server connection
+                Debug.WriteLine("[MainWindow] Probando conexión con servidor...");
+                bool canConnect = await ServerManager.Instance.TestConnectionAsync();
+                Debug.WriteLine($"[MainWindow] Conexión servidor: {(canConnect ? "OK" : "FALLO")}");
+                
                 // Navigate to login
+                Debug.WriteLine("[MainWindow] Navegando a LoginPage...");
                 MainFrame.Navigate(new LoginPage());
                 
                 ShowLoading(false);
+                Debug.WriteLine("[MainWindow] InitializeAsync completado");
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show($"Error al inicializar: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Debug.WriteLine($"[MainWindow] ERROR: {ex.Message}");
+                Debug.WriteLine($"[MainWindow] StackTrace: {ex.StackTrace}");
+                
                 ShowLoading(false);
+                MessageBox.Show(
+                    $"Error al inicializar:\n{ex.Message}",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
             }
         }
 
         public void ShowLoading(bool show)
         {
-            LoadingOverlay.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+            try
+            {
+                LoadingOverlay.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[MainWindow] Error en ShowLoading: {ex.Message}");
+            }
         }
 
         public void NavigateTo(Page page)
         {
-            MainFrame.Navigate(page);
+            try
+            {
+                MainFrame.Navigate(page);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[MainWindow] Error al navegar: {ex.Message}");
+                MessageBox.Show($"Error en navegación: {ex.Message}");
+            }
         }
     }
 }

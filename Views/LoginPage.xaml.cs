@@ -1,7 +1,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using LauncherPhantom.Managers;
 using LauncherPhantom.Models;
@@ -18,30 +18,43 @@ namespace LauncherPhantom.Views
 
         private void LoginPage_Loaded(object sender, RoutedEventArgs e)
         {
-            // Load saved credentials if "Remember Me" was checked
-            var savedUsername = ConfigManager.Instance.GetSetting("saved_username");
-            var savedPassword = ConfigManager.Instance.GetSetting("saved_password");
-
-            if (!string.IsNullOrEmpty(savedUsername))
+            try
             {
-                UsernameTextBox.Text = EncryptionManager.Instance.Decrypt(savedUsername);
-                RememberMeCheckBox.IsChecked = true;
+                Debug.WriteLine("[LoginPage] Página cargada");
                 
-                if (!string.IsNullOrEmpty(savedPassword))
+                // Load saved credentials if "Remember Me" was checked
+                var savedUsername = ConfigManager.Instance.GetSetting("saved_username");
+                var savedPassword = ConfigManager.Instance.GetSetting("saved_password");
+
+                if (!string.IsNullOrEmpty(savedUsername))
                 {
-                    PasswordBox.Password = EncryptionManager.Instance.Decrypt(savedPassword);
+                    UsernameTextBox.Text = EncryptionManager.Instance.Decrypt(savedUsername);
+                    RememberMeCheckBox.IsChecked = true;
+                    
+                    if (!string.IsNullOrEmpty(savedPassword))
+                    {
+                        PasswordBox.Password = EncryptionManager.Instance.Decrypt(savedPassword);
+                    }
+                    
+                    Debug.WriteLine("[LoginPage] Credenciales pre-llenadas");
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[LoginPage] Error en LoadedEvent: {ex.Message}");
             }
         }
 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
+            Debug.WriteLine("[LoginPage] LoginButton_Click");
             ErrorMessageText.Visibility = Visibility.Collapsed;
             
             // Validation
             var validationResult = ValidateInputs();
             if (!validationResult.IsValid)
             {
+                Debug.WriteLine($"[LoginPage] Validación falló: {validationResult.Message}");
                 ShowError(validationResult.Message);
                 return;
             }
@@ -52,6 +65,8 @@ namespace LauncherPhantom.Views
 
             try
             {
+                Debug.WriteLine("[LoginPage] Enviando request de login...");
+                
                 var request = new LoginRequest
                 {
                     Username = UsernameTextBox.Text,
@@ -62,6 +77,8 @@ namespace LauncherPhantom.Views
 
                 if (response.Success)
                 {
+                    Debug.WriteLine("[LoginPage] Login exitoso");
+                    
                     // Save credentials if remember me is checked
                     if (RememberMeCheckBox.IsChecked.GetValueOrDefault())
                     {
@@ -69,6 +86,8 @@ namespace LauncherPhantom.Views
                             EncryptionManager.Instance.Encrypt(UsernameTextBox.Text));
                         ConfigManager.Instance.SetSetting("saved_password", 
                             EncryptionManager.Instance.Encrypt(PasswordBox.Password));
+                        
+                        Debug.WriteLine("[LoginPage] Credenciales guardadas");
                     }
                     else
                     {
@@ -84,12 +103,14 @@ namespace LauncherPhantom.Views
                 }
                 else
                 {
+                    Debug.WriteLine($"[LoginPage] Login fallo: {response.Error}");
                     SoundManager.Instance.PlaySound("error");
                     ShowError(response.Error ?? "Error desconocido");
                 }
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"[LoginPage] ERROR: {ex.Message}");
                 SoundManager.Instance.PlaySound("error");
                 ShowError($"Error de conexión: {ex.Message}");
             }
@@ -102,6 +123,7 @@ namespace LauncherPhantom.Views
 
         private void RegisterLink_Click(object sender, RoutedEventArgs e)
         {
+            Debug.WriteLine("[LoginPage] Navegando a RegisterPage");
             var mainWindow = Application.Current.MainWindow as MainWindow;
             mainWindow?.NavigateTo(new RegisterPage());
         }

@@ -1,0 +1,11 @@
+{
+  "app_name": "Launcher Phantom",
+  "app_version": "0.1.0",
+  "server_url": "http://localhost:5000",
+  "language": "es",
+  "theme": "dark",
+  "window_width": 1280,
+  "window_height": 720,
+  "auto_update": true,
+  "debug_mode": false
+}

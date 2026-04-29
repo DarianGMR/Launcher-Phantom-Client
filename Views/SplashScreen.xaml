@@ -10,7 +10,7 @@
         ShowInTaskbar="False"
         Topmost="True">
     
-    <Grid Background="#0A0E27">
+    <Grid>
         <!-- Gradient Background -->
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">

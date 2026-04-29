@@ -7,10 +7,8 @@
         WindowStartupLocation="CenterScreen"
         Background="#0A0E27"
         Foreground="#FFFFFF"
-        WindowStyle="None"
-        AllowsTransparency="True"
-        ResizeMode="NoResize"
-        Icon="Resources/logo.png">
+        WindowStyle="SingleBorderWindow"
+        ResizeMode="CanResize">
     
     <Grid>
         <!-- Main Frame for navigation -->

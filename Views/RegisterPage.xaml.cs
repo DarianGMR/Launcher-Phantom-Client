@@ -2,7 +2,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using LauncherPhantom.Managers;
 using LauncherPhantom.Models;
@@ -61,11 +61,13 @@ namespace LauncherPhantom.Views
 
         private async void RegisterButton_Click(object sender, RoutedEventArgs e)
         {
+            Debug.WriteLine("[RegisterPage] RegisterButton_Click");
             ErrorMessageText.Visibility = Visibility.Collapsed;
 
             var validationResult = ValidateInputs();
             if (!validationResult.IsValid)
             {
+                Debug.WriteLine($"[RegisterPage] Validación falló: {validationResult.Message}");
                 ShowError(validationResult.Message);
                 return;
             }
@@ -75,6 +77,8 @@ namespace LauncherPhantom.Views
 
             try
             {
+                Debug.WriteLine("[RegisterPage] Enviando request de registro...");
+                
                 var request = new RegisterRequest
                 {
                     Username = UsernameTextBox.Text,
@@ -86,6 +90,8 @@ namespace LauncherPhantom.Views
 
                 if (response.Success)
                 {
+                    Debug.WriteLine("[RegisterPage] Registro exitoso");
+                    
                     SoundManager.Instance.PlaySound("success");
                     MessageBox.Show("¡Cuenta creada exitosamente!\nRedirigiendo a Login...", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
                     
@@ -97,12 +103,16 @@ namespace LauncherPhantom.Views
                 }
                 else
                 {
+                    Debug.WriteLine($"[RegisterPage] Registro fallo: {response.Error}");
+                    
                     SoundManager.Instance.PlaySound("error");
                     ShowError(response.Error ?? "Error desconocido");
                 }
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"[RegisterPage] ERROR: {ex.Message}");
+                
                 SoundManager.Instance.PlaySound("error");
                 ShowError($"Error: {ex.Message}");
             }
@@ -115,6 +125,7 @@ namespace LauncherPhantom.Views
 
         private void LoginLink_Click(object sender, RoutedEventArgs e)
         {
+            Debug.WriteLine("[RegisterPage] Navegando a LoginPage");
             var mainWindow = Application.Current.MainWindow as MainWindow;
             mainWindow?.NavigateTo(new LoginPage());
         }
@@ -128,7 +139,7 @@ namespace LauncherPhantom.Views
             if (UsernameTextBox.Text.Length < 3 || UsernameTextBox.Text.Length > 20)
                 return (false, "El usuario debe tener entre 3 y 20 caracteres");
 
-            if (!Regex.IsMatch(UsernameTextBox.Text, @"^[a-zA-Z0-9_-]"))
+            if (!Regex.IsMatch(UsernameTextBox.Text, @"^[a-zA-Z]"))
                 return (false, "El usuario no puede empezar con número");
 
             if (!Regex.IsMatch(UsernameTextBox.Text, @"^[a-zA-Z0-9_-]+$"))
@@ -159,7 +170,7 @@ namespace LauncherPhantom.Views
                 return (false, "La contraseña debe contener mayúsculas");
 
             if (!Regex.IsMatch(PasswordBox.Password, "[0-9]"))
-                return (false, "La contraseña debe contener números");
+                return (false, "La contrase��a debe contener números");
 
             if (!Regex.IsMatch(PasswordBox.Password, "[^a-zA-Z0-9]"))
                 return (false, "La contraseña debe contener símbolos especiales");

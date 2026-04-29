@@ -4,10 +4,6 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Resources/Styles.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-
             <!-- Colors -->
             <SolidColorBrush x:Key="BackgroundBrush" Color="#0A0E27"/>
             <SolidColorBrush x:Key="SecondaryBackgroundBrush" Color="#1A1F3A"/>
@@ -20,9 +16,39 @@
             <SolidColorBrush x:Key="SuccessBrush" Color="#00FF00"/>
             <SolidColorBrush x:Key="WarningBrush" Color="#FFB800"/>
 
-            <!-- Fonts -->
-            <FontFamily x:Key="PrimaryFont">pack://application:,,,/Resources/Fonts/#Inter</FontFamily>
-            <FontFamily x:Key="TitleFont">pack://application:,,,/Resources/Fonts/#Orbitron</FontFamily>
+            <!-- Button Styles -->
+            <Style TargetType="Button" x:Key="PrimaryButton">
+                <Setter Property="Background" Value="#00D9FF"/>
+                <Setter Property="Foreground" Value="#0A0E27"/>
+                <Setter Property="Padding" Value="10"/>
+                <Setter Property="Height" Value="40"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Cursor" Value="Hand"/>
+            </Style>
+
+            <Style TargetType="Button" x:Key="SuccessButton">
+                <Setter Property="Background" Value="#39FF14"/>
+                <Setter Property="Foreground" Value="#0A0E27"/>
+                <Setter Property="Padding" Value="10"/>
+                <Setter Property="Height" Value="40"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Cursor" Value="Hand"/>
+            </Style>
+
+            <!-- TextBox Styles -->
+            <Style TargetType="TextBox">
+                <Setter Property="Background" Value="#1A1F3A"/>
+                <Setter Property="Foreground" Value="#FFFFFF"/>
+                <Setter Property="Padding" Value="10"/>
+                <Setter Property="Height" Value="40"/>
+                <Setter Property="Margin" Value="0,0,0,15"/>
+            </Style>
+
+            <!-- CheckBox Styles -->
+            <Style TargetType="CheckBox">
+                <Setter Property="Foreground" Value="#FFFFFF"/>
+                <Setter Property="Margin" Value="0,0,0,20"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
