@@ -25,6 +25,7 @@ namespace LauncherPhantom.Views
                 // Load saved credentials if "Remember Me" was checked
                 var savedUsername = ConfigManager.Instance.GetSetting("saved_username");
                 var savedPassword = ConfigManager.Instance.GetSetting("saved_password");
+                var savedServerIp = ConfigManager.Instance.GetSetting("server_url");
 
                 if (!string.IsNullOrEmpty(savedUsername))
                 {
@@ -34,6 +35,13 @@ namespace LauncherPhantom.Views
                     if (!string.IsNullOrEmpty(savedPassword))
                     {
                         PasswordBox.Password = EncryptionManager.Instance.Decrypt(savedPassword);
+                    }
+                    
+                    if (!string.IsNullOrEmpty(savedServerIp))
+                    {
+                        // Extract IP from full URL
+                        var ip = savedServerIp.Replace("http://", "").Replace("https://", "");
+                        ServerIpTextBox.Text = ip;
                     }
                     
                     Debug.WriteLine("[LoginPage] Credenciales pre-llenadas");

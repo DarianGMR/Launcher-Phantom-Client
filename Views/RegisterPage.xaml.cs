@@ -137,6 +137,24 @@ namespace LauncherPhantom.Views
             }
         }
 
+        private void TermsLink_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine("[RegisterPage] Abriendo Términos y Condiciones...");
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "https://example.com/terms",
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[RegisterPage] Error abriendo navegador: {ex.Message}");
+                MessageBox.Show("No se pudo abrir el navegador. Visita https://example.com/terms", "Información");
+            }
+        }
+
         private void LoginLink_Click(object sender, RoutedEventArgs e)
         {
             Debug.WriteLine("[RegisterPage] Navegando a LoginPage");

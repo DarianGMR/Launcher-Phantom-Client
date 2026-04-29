@@ -79,9 +79,8 @@
                           Foreground="#FFFFFF"
                           Margin="0,0,0,10"/>
                 <TextBlock TextAlignment="Center" Margin="0,0,0,20">
-                    <Hyperlink Foreground="#00D9FF" NavigateUri="https://example.com/terms">
-                        Leer Términos y Condiciones
-                    </Hyperlink>
+                    <Run Text="Lee los " Foreground="#A0A0A0"/>
+                    <Hyperlink Foreground="#00D9FF" Click="TermsLink_Click">Términos y Condiciones</Hyperlink>
                 </TextBlock>
 
                 <!-- Error Message -->

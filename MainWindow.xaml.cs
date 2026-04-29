@@ -2,13 +2,15 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using LauncherPhantom.Views;
-using LauncherPhantom.Managers;
 
 namespace LauncherPhantom
 {
     public partial class MainWindow : Window
     {
+        private NavigationService _navigationService;
+
         public MainWindow()
         {
             try
@@ -17,6 +19,7 @@ namespace LauncherPhantom
                 
                 Loaded += async (s, e) =>
                 {
+                    _navigationService = MainFrame.NavigationService;
                     await InitializeAsync();
                 };
             }
@@ -27,19 +30,37 @@ namespace LauncherPhantom
             }
         }
 
-        private async System.Threading.Tasks.Task InitializeAsync()
+        private async Task InitializeAsync()
         {
             try
             {
                 Debug.WriteLine("[MainWindow] Iniciando InitializeAsync...");
                 
-                // Hide loading - no connection test on startup
-                ShowLoading(false);
-                Debug.WriteLine("[MainWindow] Loading ocultado");
+                // Show splash screen with 5 second minimum
+                Debug.WriteLine("[MainWindow] Mostrando Splash Screen...");
+                SplashScreen.Visibility = Visibility.Visible;
+                MainFrame.Visibility = Visibility.Collapsed;
+                
+                // Simulate loading with progress bar animation
+                for (int i = 0; i <= 100; i += 10)
+                {
+                    SplashProgressBar.Value = i;
+                    await Task.Delay(500);
+                }
+                SplashProgressBar.Value = 100;
+                
+                // Wait for 5 seconds total
+                await Task.Delay(1000);
+                
+                Debug.WriteLine("[MainWindow] Splash Screen completado");
+                
+                // Hide splash and show main frame
+                SplashScreen.Visibility = Visibility.Collapsed;
+                MainFrame.Visibility = Visibility.Visible;
 
-                // Navigate to login directly - NO server connection test here
+                // Navigate to login
                 Debug.WriteLine("[MainWindow] Navegando a LoginPage...");
-                MainFrame.Navigate(new LoginPage());
+                NavigateTo(new LoginPage());
                 
                 Debug.WriteLine("[MainWindow] InitializeAsync completado");
             }
@@ -48,7 +69,9 @@ namespace LauncherPhantom
                 Debug.WriteLine($"[MainWindow] ERROR: {ex.Message}");
                 Debug.WriteLine($"[MainWindow] StackTrace: {ex.StackTrace}");
                 
-                ShowLoading(false);
+                SplashScreen.Visibility = Visibility.Collapsed;
+                MainFrame.Visibility = Visibility.Visible;
+                
                 MessageBox.Show(
                     $"Error al inicializar:\n{ex.Message}",
                     "Error",
@@ -74,13 +97,19 @@ namespace LauncherPhantom
         {
             try
             {
-                MainFrame.Navigate(page);
-                MainFrame.RemoveBackEntry(); // Prevent going back
+                if (_navigationService == null)
+                {
+                    _navigationService = MainFrame.NavigationService;
+                }
+                
+                _navigationService.Navigate(page);
+                Debug.WriteLine($"[MainWindow] Navegación exitosa a {page.GetType().Name}");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[MainWindow] Error al navegar: {ex.Message}");
-                MessageBox.Show($"Error en navegación: {ex.Message}");
+                Debug.WriteLine($"[MainWindow] StackTrace: {ex.StackTrace}");
+                MessageBox.Show($"Error en navegación: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

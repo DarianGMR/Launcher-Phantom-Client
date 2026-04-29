@@ -8,19 +8,48 @@
         Background="#0A0E27"
         Foreground="#FFFFFF"
         WindowStyle="SingleBorderWindow"
-        ResizeMode="CanResize">
+        ResizeMode="CanResize"
+        AllowsTransparency="False">
     
     <Grid>
+        <!-- Splash Screen -->
+        <Grid x:Name="SplashScreen" Background="#0A0E27" ZIndex="100">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="LAUNCHER PHANTOM" 
+                           Foreground="#00D9FF" 
+                           FontSize="32"
+                           FontWeight="Bold"
+                           TextAlignment="Center"
+                           Margin="0,0,0,30"
+                           FontFamily="pack://application:,,,/Resources/Fonts/#Orbitron"/>
+                
+                <ProgressBar x:Name="SplashProgressBar" 
+                             Width="300" 
+                             Height="6" 
+                             Foreground="#00D9FF"
+                             Background="#1A1F3A"
+                             Margin="0,0,0,20"/>
+                
+                <TextBlock Text="Cargando recursos..." 
+                           Foreground="#A0A0A0" 
+                           FontSize="14"
+                           TextAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+
         <!-- Main Frame for navigation -->
         <Frame x:Name="MainFrame" 
                NavigationUIVisibility="Hidden"
-               Background="#0A0E27"/>
+               Background="#0A0E27"
+               ZIndex="50"
+               Visibility="Collapsed"/>
         
         <!-- Loading Overlay -->
         <Grid x:Name="LoadingOverlay" 
               Background="#0A0E27" 
               Opacity="0.9"
-              Visibility="Collapsed">
+              Visibility="Collapsed"
+              ZIndex="75">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                 <ProgressBar x:Name="LoadingSpinner" 
                              Width="100" 
