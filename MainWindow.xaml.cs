@@ -9,8 +9,6 @@ namespace LauncherPhantom
 {
     public partial class MainWindow : Window
     {
-        private NavigationService _navigationService;
-
         public MainWindow()
         {
             try
@@ -19,7 +17,6 @@ namespace LauncherPhantom
                 
                 Loaded += async (s, e) =>
                 {
-                    _navigationService = MainFrame.NavigationService;
                     await InitializeAsync();
                 };
             }
@@ -97,12 +94,7 @@ namespace LauncherPhantom
         {
             try
             {
-                if (_navigationService == null)
-                {
-                    _navigationService = MainFrame.NavigationService;
-                }
-                
-                _navigationService.Navigate(page);
+                MainFrame.Navigate(page);
                 Debug.WriteLine($"[MainWindow] Navegación exitosa a {page.GetType().Name}");
             }
             catch (Exception ex)
