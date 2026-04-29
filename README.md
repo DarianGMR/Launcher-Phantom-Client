@@ -22,13 +22,14 @@ TagLibSharp (2.2.0)
 ```bash
 dotnet build -c Debug
 dotnet run
-
-Modo Release
-bash
-dotnet build -c Release
-Native AOT
 ```
+### Modo Release
+
 ```bash
+dotnet build -c Release
+
+Native AOT
+
 dotnet publish -c Release -p:PublishAot=true -r win-x64
 ```
 Esto genera un ejecutable standalone optimizado en:
