@@ -27,20 +27,21 @@ Modo Release
 bash
 dotnet build -c Release
 Native AOT
-
-bash
+```
+```bash
 dotnet publish -c Release -p:PublishAot=true -r win-x64
-
+```
 Esto genera un ejecutable standalone optimizado en:
 bin/Release/net8.0-windows/win-x64/publish/LauncherPhantom.exe
 
-🎨 Características - Phase 1 (Auth)
+## 🎨 Características - Phase 1 (Auth)
 ✅ Splash Screen
 
 Animación de carga (5 segundos máximo)
 Logo Phantom con fade-in/fade-out
 Barra de progreso visual
 Spinner de carga
+
 ✅ Panel de Login
 
 Validación de credenciales local
@@ -49,6 +50,7 @@ Campo contraseña
 Campo dirección IP servidor
 Checkbox "Recuérdame" (encriptado DPAPI)
 Mensajes de error claros
+
 ✅ Panel de Registro
 
 Validación completa de formulario
@@ -56,28 +58,33 @@ Indicador de fortaleza de contraseña
 Términos y condiciones
 Email y usuario únicos
 Link a términos (browser)
+
 ✅ Autenticación
 
 Comunicación HTTP con Launcher Server
 JWT token encriptado localmente
 Manejo de errores servidor
 Retry automático
+
 ✅ Actualización
 
 Verificación de versión servidor
 Diálogo de actualización disponible
 Descarga con barra de progreso
 Aplicación de actualización
+
 ✅ Audio
 
 Sonidos: click, success, error
 Reproducción asíncrona
+
 ✅ Almacenamiento Local
 
 Encriptación DPAPI de datos sensibles
 Base de datos SQLite
 Configuración JSON
-🌐 Configuración del Servidor
+
+## 🌐 Configuración del Servidor
 El servidor Launcher debe proporcionar estos endpoints:
 
 POST /api/auth/login
@@ -136,13 +143,15 @@ Response:
 }
 GET /health
 Response: 200 OK
-🔐 Encriptación
+
+## 🔐 Encriptación
 Los datos sensibles (contraseñas, tokens JWT) se encriptan usando DPAPI de Windows:
 
 C#
 var encrypted = EncryptionManager.Instance.Encrypt(plainText);
 var decrypted = EncryptionManager.Instance.Decrypt(encryptedText);
-📁 Estructura de Carpetas
+
+## 📁 Estructura de Carpetas
 LauncherPhantom/
 ├── Views/
 │   ├── SplashScreen.xaml
@@ -173,16 +182,19 @@ LauncherPhantom/
 │   ├── error.wav
 │   └── config.json
 └── App.xaml
-🔊 Recursos de Audio
+
+## 🔊 Recursos de Audio
 Requiere tres archivos .wav en Resources/:
 
 click.wav - Sonido al hacer clic
 success.wav - Sonido de éxito
 error.wav - Sonido de error
-⌨️ Atajos de Teclado
+
+## ⌨️ Atajos de Teclado
 Enter - Enviar formulario (Login/Register)
 Escape - Cerrar ventanas de diálogo
-🐛 Debugging
+
+## 🐛 Debugging
 Habilita el modo debug en config.json:
 
 JSON
@@ -191,21 +203,32 @@ JSON
 }
 Ver logs en %APPDATA%\Phantom\launcher.db tabla Logs.
 
-🚀 Próximas Fases
+## 🚀 Próximas Fases
 Phase 2: Dashboard y gestión de juegos
 Phase 3: Descarga y ejecución de juegos
 Phase 4: Sistema de mods
 Phase 5: Social features (chat, amigos)
-📝 Licencia
+
+## 📝 Licencia
 Privado - DarianGMR
 
-👤 Autor
+## 👤 Autor
 DarianGMR
-
 Versión: 0.1.0 Última actualización: 2026-04-29
 
+---
+
+## 📥 DESCARGA
+
+Aquí están **TODOS los archivos listos** para que los copies directamente a tu proyecto Visual Studio.
+
 **Pasos para usar los archivos:**
+
+1. **Crea un nuevo proyecto WPF** en Visual Studio 2019+ (`.NET 8.0`)
+2. **Copia todos los archivos** en su estructura de carpetas correspondiente
+3. **Instala los NuGet packages**:
 Install-Package Newtonsoft.Json Install-Package System.Data.SQLite Install-Package BCrypt.Net-Next Install-Package TagLibSharp
+
 4. **Agrega los recursos** (imágenes y sonidos) en la carpeta `Resources/`
 5. **Compila** con `dotnet build`
 6. **Ejecuta** con `dotnet run`
