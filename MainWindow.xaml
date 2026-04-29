@@ -2,155 +2,219 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Launcher Phantom" 
+        Width="640" 
+        Height="480"
         MinWidth="640"
         MinHeight="480"
-        Width="1280" 
-        Height="720"
+        MaxWidth="640"
+        MaxHeight="480"
         WindowStartupLocation="CenterScreen"
         Background="#0A0E27"
         Foreground="#FFFFFF"
-        WindowStyle="SingleBorderWindow"
-        ResizeMode="CanResize"
-        AllowsTransparency="False"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
         Icon="pack://application:,,,/Resources/Images/icon.ico">
     
     <Grid>
-        <!-- Main Frame for navigation (base layer) -->
-        <Frame x:Name="MainFrame" 
-               NavigationUIVisibility="Hidden"
-               Background="#0A0E27"
-               Visibility="Collapsed"/>
+        <!-- Title Bar with Custom Buttons -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         
-        <!-- Loading Overlay (middle layer) -->
-        <Grid x:Name="LoadingOverlay" 
-              Background="#0A0E27" 
-              Opacity="1"
-              Visibility="Collapsed">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            
-            <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Width="300">
-                <!-- Animated Logo -->
-                <TextBlock Text="◆" 
-                           Foreground="#00D9FF" 
-                           FontSize="48"
-                           TextAlignment="Center"
-                           Margin="0,0,0,20"
-                           x:Name="AnimatedLogo"
-                           FontWeight="Bold"/>
-                
-                <!-- Title -->
-                <TextBlock Text="LAUNCHER PHANTOM" 
-                           Foreground="#00D9FF" 
-                           FontSize="24"
-                           FontWeight="Bold"
-                           TextAlignment="Center"
-                           Margin="0,0,0,30"
-                           Opacity="0.9"/>
-                
-                <!-- Animated Loading Bars -->
-                <Grid Margin="0,0,0,20" Height="60">
-                    <Canvas>
-                        <ProgressBar x:Name="LoadBar1" Width="30" Height="3" Foreground="#00D9FF" Canvas.Left="10" Canvas.Top="10"/>
-                        <ProgressBar x:Name="LoadBar2" Width="30" Height="3" Foreground="#7B2CBF" Canvas.Left="50" Canvas.Top="10"/>
-                        <ProgressBar x:Name="LoadBar3" Width="30" Height="3" Foreground="#39FF14" Canvas.Left="90" Canvas.Top="10"/>
-                        <ProgressBar x:Name="LoadBar4" Width="30" Height="3" Foreground="#00D9FF" Canvas.Left="130" Canvas.Top="10"/>
-                        <ProgressBar x:Name="LoadBar5" Width="30" Height="3" Foreground="#FFB800" Canvas.Left="170" Canvas.Top="10"/>
-                    </Canvas>
-                </Grid>
-                
-                <!-- Loading Text -->
-                <TextBlock x:Name="LoadingText" 
-                           Text="Cargando recursos..." 
-                           Foreground="#A0A0A0" 
-                           FontSize="12"
-                           TextAlignment="Center"
-                           Margin="0,0,0,10"/>
-                
-                <!-- Percentage -->
-                <TextBlock x:Name="LoadingPercentage" 
-                           Text="0%" 
-                           Foreground="#00D9FF" 
-                           FontSize="14"
-                           FontWeight="Bold"
-                           TextAlignment="Center"/>
-            </StackPanel>
-        </Grid>
-
-        <!-- Splash Screen (top layer) -->
-        <Grid x:Name="SplashScreen" Background="#0A0E27">
+        <!-- Custom Title Bar -->
+        <Grid Grid.Row="0" Background="#050A1F" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             
-            <!-- Animated Background Left -->
-            <Canvas Grid.Column="0" Background="#0A0E27">
-                <Ellipse Width="400" Height="400" Fill="#00D9FF" Opacity="0.05" Canvas.Left="-100" Canvas.Top="-100"/>
-                <Ellipse Width="300" Height="300" Fill="#7B2CBF" Opacity="0.08" Canvas.Right="-50" Canvas.Bottom="-50"/>
+            <!-- Title and Icon -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                <TextBlock Text="◆" Foreground="#00D9FF" FontSize="14" FontWeight="Bold" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <TextBlock Text="LAUNCHER PHANTOM" Foreground="#00D9FF" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" Opacity="0.95"/>
+            </StackPanel>
+            
+            <!-- Window Control Buttons -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Right">
+                <!-- Minimize Button -->
+                <Button x:Name="MinimizeButton" 
+                        Width="35" 
+                        Height="35" 
+                        Background="Transparent" 
+                        Foreground="#00D9FF"
+                        BorderThickness="0"
+                        FontSize="14"
+                        Cursor="Hand"
+                        Click="MinimizeButton_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" Padding="0">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#1A2050"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Background" Value="#0F1535"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <TextBlock Text="−" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,-1,0,0"/>
+                </Button>
                 
-                <StackPanel Canvas.Left="30" Canvas.Top="50" Width="220">
-                    <TextBlock Text="◆◆◆" 
+                <!-- Close Button -->
+                <Button x:Name="CloseButton" 
+                        Width="35" 
+                        Height="35" 
+                        Background="Transparent" 
+                        Foreground="#FF3333"
+                        BorderThickness="0"
+                        FontSize="16"
+                        Cursor="Hand"
+                        Click="CloseButton_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" Padding="0">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#3D1515"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Background" Value="#2A0F0F"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                    <TextBlock Text="✕" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,-1,0,0" FontWeight="SemiBold"/>
+                </Button>
+            </StackPanel>
+            
+            <!-- Separator Line -->
+            <Rectangle Grid.ColumnSpan="2" VerticalAlignment="Bottom" Height="1" Fill="#00D9FF" Opacity="0.2"/>
+        </Grid>
+        
+        <!-- Main Content -->
+        <Grid Grid.Row="1">
+            <!-- Main Frame for navigation (base layer) -->
+            <Frame x:Name="MainFrame" 
+                   NavigationUIVisibility="Hidden"
+                   Background="#0A0E27"
+                   Visibility="Collapsed"/>
+            
+            <!-- Loading Overlay (middle layer) -->
+            <Grid x:Name="LoadingOverlay" 
+                  Background="#0A0E27" 
+                  Opacity="1"
+                  Visibility="Collapsed">
+                
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="280">
+                    <!-- Animated Logo -->
+                    <TextBlock Text="◆" 
                                Foreground="#00D9FF" 
-                               FontSize="64"
+                               FontSize="40"
                                TextAlignment="Center"
-                               Margin="0,0,0,40"
-                               FontWeight="Bold"
-                               Opacity="0.9"/>
+                               Margin="0,0,0,12"
+                               x:Name="AnimatedLogo"
+                               FontWeight="Bold"/>
                     
-                    <TextBlock Text="LAUNCHER" 
+                    <!-- Title -->
+                    <TextBlock Text="LAUNCHER PHANTOM" 
                                Foreground="#00D9FF" 
-                               FontSize="32"
+                               FontSize="16"
                                FontWeight="Bold"
                                TextAlignment="Center"
-                               Margin="0,0,0,5"/>
+                               Margin="0,0,0,20"
+                               Opacity="0.95"/>
                     
-                    <TextBlock Text="PHANTOM" 
-                               Foreground="#39FF14" 
-                               FontSize="32"
-                               FontWeight="Bold"
-                               TextAlignment="Center"
-                               Margin="0,0,0,30"/>
+                    <!-- Animated Loading Bars -->
+                    <Grid Margin="0,0,0,16" Height="40">
+                        <Canvas>
+                            <ProgressBar x:Name="LoadBar1" Width="20" Height="2" Foreground="#00D9FF" Canvas.Left="6" Canvas.Top="8"/>
+                            <ProgressBar x:Name="LoadBar2" Width="20" Height="2" Foreground="#7B2CBF" Canvas.Left="32" Canvas.Top="8"/>
+                            <ProgressBar x:Name="LoadBar3" Width="20" Height="2" Foreground="#39FF14" Canvas.Left="58" Canvas.Top="8"/>
+                            <ProgressBar x:Name="LoadBar4" Width="20" Height="2" Foreground="#00D9FF" Canvas.Left="84" Canvas.Top="8"/>
+                            <ProgressBar x:Name="LoadBar5" Width="20" Height="2" Foreground="#FFB800" Canvas.Left="110" Canvas.Top="8"/>
+                        </Canvas>
+                    </Grid>
                     
-                    <TextBlock Text="Cliente Launcher Phantom v0.1" 
+                    <!-- Loading Text -->
+                    <TextBlock x:Name="LoadingText" 
+                               Text="Cargando recursos..." 
                                Foreground="#A0A0A0" 
                                FontSize="11"
                                TextAlignment="Center"
-                               Margin="0,0,0,20"/>
+                               Margin="0,0,0,8"/>
                     
-                    <Line X1="0" Y1="0" X2="200" Y2="0" Stroke="#00D9FF" StrokeThickness="1" Margin="10,0"/>
+                    <!-- Percentage -->
+                    <TextBlock x:Name="LoadingPercentage" 
+                               Text="0%" 
+                               Foreground="#00D9FF" 
+                               FontSize="13"
+                               FontWeight="Bold"
+                               TextAlignment="Center"/>
                 </StackPanel>
-            </Canvas>
-            
-            <!-- Progress and Info Right -->
-            <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Width="280">
-                <ProgressBar x:Name="SplashProgressBar" 
-                             Width="280" 
-                             Height="8" 
-                             Foreground="#00D9FF"
-                             Background="#1A1F3A"
-                             Margin="0,0,0,20"
-                             Value="0"/>
-                
-                <TextBlock Text="Inicializando..." 
-                           Foreground="#A0A0A0" 
-                           FontSize="13"
-                           TextAlignment="Center"
-                           Margin="0,0,0,10"
-                           x:Name="SplashStatus"/>
-                
-                <ProgressBar x:Name="SplashDotsProgress" 
-                             Width="100" 
-                             Height="4" 
-                             Foreground="#7B2CBF"
-                             Background="#1A1F3A"
-                             Margin="0,0,0,20"
-                             HorizontalAlignment="Center"
-                             IsIndeterminate="True"/>
-            </StackPanel>
+            </Grid>
+
+            <!-- Splash Screen (top layer) -->
+            <Grid x:Name="SplashScreen" Background="#0A0E27">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="300">
+                    <!-- Logo -->
+                    <TextBlock Text="◆◆◆" 
+                               Foreground="#00D9FF" 
+                               FontSize="40"
+                               TextAlignment="Center"
+                               Margin="0,0,0,16"
+                               FontWeight="Bold"
+                               Opacity="0.95"/>
+                    
+                    <!-- Title -->
+                    <TextBlock Text="LAUNCHER" 
+                               Foreground="#00D9FF" 
+                               FontSize="18"
+                               FontWeight="Bold"
+                               TextAlignment="Center"
+                               Margin="0,0,0,2"/>
+                    
+                    <TextBlock Text="PHANTOM" 
+                               Foreground="#39FF14" 
+                               FontSize="18"
+                               FontWeight="Bold"
+                               TextAlignment="Center"
+                               Margin="0,0,0,16"/>
+                    
+                    <!-- Progress Bar -->
+                    <ProgressBar x:Name="SplashProgressBar" 
+                                 Width="220" 
+                                 Height="5" 
+                                 Foreground="#00D9FF"
+                                 Background="#1A1F3A"
+                                 Margin="0,0,0,12"
+                                 Value="0"/>
+                    
+                    <!-- Status Text -->
+                    <TextBlock Text="Inicializando..." 
+                               Foreground="#A0A0A0" 
+                               FontSize="10"
+                               TextAlignment="Center"
+                               Margin="0,0,0,8"
+                               x:Name="SplashStatus"/>
+                    
+                    <!-- Animated Progress -->
+                    <ProgressBar x:Name="SplashDotsProgress" 
+                                 Width="60" 
+                                 Height="2" 
+                                 Foreground="#7B2CBF"
+                                 Background="#1A1F3A"
+                                 HorizontalAlignment="Center"
+                                 IsIndeterminate="True"/>
+                </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </Window>
