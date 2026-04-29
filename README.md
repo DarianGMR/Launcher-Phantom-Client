@@ -204,20 +204,8 @@ DarianGMR
 
 Versión: 0.1.0 Última actualización: 2026-04-29
 
-
----
-
-## 📥 DESCARGA
-
-Aquí están **TODOS los archivos listos** para que los copies directamente a tu proyecto Visual Studio.
-
 **Pasos para usar los archivos:**
-
-1. **Crea un nuevo proyecto WPF** en Visual Studio 2019+ (`.NET 8.0`)
-2. **Copia todos los archivos** en su estructura de carpetas correspondiente
-3. **Instala los NuGet packages**:
 Install-Package Newtonsoft.Json Install-Package System.Data.SQLite Install-Package BCrypt.Net-Next Install-Package TagLibSharp
-
 4. **Agrega los recursos** (imágenes y sonidos) en la carpeta `Resources/`
 5. **Compila** con `dotnet build`
 6. **Ejecuta** con `dotnet run`
