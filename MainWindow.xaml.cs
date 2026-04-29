@@ -135,7 +135,7 @@ namespace LauncherPhantom
                 var bar = bars[i];
                 var animation = new DoubleAnimation(0, 100, TimeSpan.FromSeconds(1.5))
                 {
-                    DelayTime = TimeSpan.FromMilliseconds(i * 150),
+                    BeginTime = TimeSpan.FromMilliseconds(i * 150),
                     RepeatBehavior = RepeatBehavior.Forever,
                     AutoReverse = true
                 };
