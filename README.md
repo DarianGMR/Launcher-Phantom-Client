@@ -87,7 +87,7 @@ Configuración JSON
 
 ## 🌐 Configuración del Servidor
 El servidor Launcher debe proporcionar estos endpoints:
-
+```bash
 POST /api/auth/login
 JSON
 Request:
@@ -144,6 +144,7 @@ Response:
 }
 GET /health
 Response: 200 OK
+```
 
 ## 🔐 Encriptación
 Los datos sensibles (contraseñas, tokens JWT) se encriptan usando DPAPI de Windows:
@@ -153,6 +154,7 @@ var encrypted = EncryptionManager.Instance.Encrypt(plainText);
 var decrypted = EncryptionManager.Instance.Decrypt(encryptedText);
 
 ## 📁 Estructura de Carpetas
+```bash
 LauncherPhantom/
 ├── Views/
 │   ├── SplashScreen.xaml
@@ -183,6 +185,7 @@ LauncherPhantom/
 │   ├── error.wav
 │   └── config.json
 └── App.xaml
+```
 
 ## 🔊 Recursos de Audio
 Requiere tres archivos .wav en Resources/:
@@ -197,11 +200,12 @@ Escape - Cerrar ventanas de diálogo
 
 ## 🐛 Debugging
 Habilita el modo debug en config.json:
-
+```bash
 JSON
 {
   "debug_mode": true
 }
+```
 Ver logs en %APPDATA%\Phantom\launcher.db tabla Logs.
 
 ## 🚀 Próximas Fases
