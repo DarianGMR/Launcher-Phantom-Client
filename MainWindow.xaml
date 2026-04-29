@@ -39,7 +39,8 @@
                            FontSize="48"
                            TextAlignment="Center"
                            Margin="0,0,0,20"
-                           x:Name="AnimatedLogo"/>
+                           x:Name="AnimatedLogo"
+                           FontWeight="Bold"/>
                 
                 <!-- Title -->
                 <TextBlock Text="LAUNCHER PHANTOM" 
@@ -48,7 +49,6 @@
                            FontWeight="Bold"
                            TextAlignment="Center"
                            Margin="0,0,0,30"
-                           FontFamily="pack://application:,,,/Resources/Fonts/#Orbitron"
                            Opacity="0.9"/>
                 
                 <!-- Animated Loading Bars -->
@@ -106,16 +106,14 @@
                                FontSize="32"
                                FontWeight="Bold"
                                TextAlignment="Center"
-                               Margin="0,0,0,5"
-                               FontFamily="pack://application:,,,/Resources/Fonts/#Orbitron"/>
+                               Margin="0,0,0,5"/>
                     
                     <TextBlock Text="PHANTOM" 
                                Foreground="#39FF14" 
                                FontSize="32"
                                FontWeight="Bold"
                                TextAlignment="Center"
-                               Margin="0,0,0,30"
-                               FontFamily="pack://application:,,,/Resources/Fonts/#Orbitron"/>
+                               Margin="0,0,0,30"/>
                     
                     <TextBlock Text="Cliente Launcher Phantom v0.1" 
                                Foreground="#A0A0A0" 
