@@ -22,7 +22,6 @@ namespace LauncherPhantom.Views
             {
                 Debug.WriteLine("[LoginPage] Página cargada");
                 
-                // Load saved credentials if "Remember Me" was checked
                 var savedUsername = ConfigManager.Instance.GetSetting("saved_username");
                 var savedPassword = ConfigManager.Instance.GetSetting("saved_password");
                 var savedServerIp = ConfigManager.Instance.GetSetting("server_url");
@@ -39,7 +38,6 @@ namespace LauncherPhantom.Views
                     
                     if (!string.IsNullOrEmpty(savedServerIp))
                     {
-                        // Extract IP from full URL
                         var ip = savedServerIp.Replace("http://", "").Replace("https://", "");
                         ServerIpTextBox.Text = ip;
                     }
@@ -58,7 +56,6 @@ namespace LauncherPhantom.Views
             Debug.WriteLine("[LoginPage] LoginButton_Click");
             ErrorMessageText.Visibility = Visibility.Collapsed;
             
-            // Validation
             var validationResult = ValidateInputs();
             if (!validationResult.IsValid)
             {
@@ -67,18 +64,14 @@ namespace LauncherPhantom.Views
                 return;
             }
 
-            // Show loading
             LoginButton.IsEnabled = false;
             LoginButton.Content = "Iniciando sesión...";
 
             try
             {
                 Debug.WriteLine("[LoginPage] Probando conexión con servidor...");
-                
-                // Update server URL from input
                 ServerManager.Instance.SetServerUrl($"http://{ServerIpTextBox.Text}");
                 
-                // Test connection
                 bool canConnect = await ServerManager.Instance.TestConnectionAsync();
                 if (!canConnect)
                 {
@@ -102,7 +95,6 @@ namespace LauncherPhantom.Views
                 {
                     Debug.WriteLine("[LoginPage] Login exitoso");
                     
-                    // Save credentials if remember me is checked
                     if (RememberMeCheckBox.IsChecked.GetValueOrDefault())
                     {
                         ConfigManager.Instance.SetSetting("saved_username", 
@@ -123,7 +115,6 @@ namespace LauncherPhantom.Views
                     SoundManager.Instance.PlaySound("success");
                     MessageBox.Show("¡Sesión iniciada exitosamente!", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
                     
-                    // Close launcher (Phase 2 will open dashboard)
                     Application.Current.Shutdown();
                 }
                 else
@@ -155,13 +146,11 @@ namespace LauncherPhantom.Views
                 if (mainWindow != null)
                 {
                     mainWindow.NavigateTo(new RegisterPage());
-                    Debug.WriteLine("[LoginPage] Navegación exitosa a RegisterPage");
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[LoginPage] Error al navegar: {ex.Message}");
-                MessageBox.Show($"Error al navegar: {ex.Message}");
             }
         }
 

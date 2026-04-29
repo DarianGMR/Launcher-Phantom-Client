@@ -4,83 +4,162 @@
       Background="#0A0E27"
       Foreground="#FFFFFF">
     
-    <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
-        <StackPanel Width="400">
-            <!-- Logo -->
-            <Image Width="100" Height="100" Margin="0,0,0,30" HorizontalAlignment="Center"/>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="200"/>
+            <ColumnDefinition Width="*" MinWidth="200"/>
+        </Grid.ColumnDefinitions>
+        
+        <!-- Left Panel - Branding -->
+        <Canvas Grid.Column="0" Background="#0A0E27">
+            <!-- Animated Background Elements -->
+            <Ellipse Width="500" Height="500" Fill="#00D9FF" Opacity="0.08" Canvas.Left="-150" Canvas.Top="-150"/>
+            <Ellipse Width="400" Height="400" Fill="#7B2CBF" Opacity="0.06" Canvas.Right="-100" Canvas.Bottom="-100"/>
+            <Line X1="0" Y1="50" X2="300" Y2="50" Stroke="#00D9FF" StrokeThickness="1" Opacity="0.3" Canvas.Left="20" Canvas.Top="100"/>
+            <Line X1="0" Y1="450" X2="300" Y2="450" Stroke="#39FF14" StrokeThickness="1" Opacity="0.3" Canvas.Left="20" Canvas.Top="100"/>
+            
+            <!-- Logo and Branding -->
+            <StackPanel Canvas.Left="30" Canvas.Top="100" Width="260">
+                <!-- Icon -->
+                <TextBlock Text="◆" 
+                           Foreground="#00D9FF" 
+                           FontSize="96"
+                           TextAlignment="Center"
+                           Margin="0,0,0,30"
+                           FontWeight="Bold"/>
+                
+                <!-- Title -->
+                <TextBlock Text="LAUNCHER" 
+                           Foreground="#00D9FF" 
+                           FontSize="28"
+                           FontWeight="Bold"
+                           TextAlignment="Center"
+                           Margin="0,0,0,0"
+                           FontFamily="pack://application:,,,/Resources/Fonts/#Orbitron"/>
+                
+                <TextBlock Text="PHANTOM" 
+                           Foreground="#39FF14" 
+                           FontSize="28"
+                           FontWeight="Bold"
+                           TextAlignment="Center"
+                           Margin="0,0,0,20"
+                           FontFamily="pack://application:,,,/Resources/Fonts/#Orbitron"/>
+                
+                <!-- Description -->
+                <TextBlock Text="Cliente Launcher Phantom" 
+                           Foreground="#A0A0A0" 
+                           FontSize="11"
+                           TextAlignment="Center"
+                           Margin="0,0,0,30"
+                           TextWrapping="Wrap"/>
+                
+                <!-- Version -->
+                <TextBlock Text="v0.1 - FASE INICIAL" 
+                           Foreground="#7B2CBF" 
+                           FontSize="10"
+                           TextAlignment="Center"
+                           Opacity="0.8"/>
+            </StackPanel>
+        </Canvas>
+        
+        <!-- Right Panel - Login Form -->
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="320" Margin="20">
+                <!-- Title -->
+                <TextBlock Text="Iniciar Sesión" 
+                           FontSize="24" 
+                           FontWeight="Bold"
+                           Foreground="#00D9FF"
+                           Margin="0,0,0,30"
+                           TextAlignment="Center"
+                           FontFamily="pack://application:,,,/Resources/Fonts/#Orbitron"/>
 
-            <!-- Title -->
-            <TextBlock Text="Iniciar Sesión" 
-                       FontSize="28" 
-                       FontWeight="Bold"
-                       Foreground="#00D9FF"
-                       Margin="0,0,0,30"
-                       TextAlignment="Center"
-                       FontFamily="pack://application:,,,/Resources/Fonts/#Orbitron"/>
-
-            <!-- Username -->
-            <TextBlock Text="Usuario o Email" Foreground="#A0A0A0" FontSize="12" Margin="0,0,0,5"/>
-            <TextBox x:Name="UsernameTextBox" 
-                     Background="#1A1F3A" 
-                     Foreground="#FFFFFF"
-                     Padding="10"
-                     Height="40"
-                     Margin="0,0,0,15"/>
-
-            <!-- Password -->
-            <TextBlock Text="Contraseña" Foreground="#A0A0A0" FontSize="12" Margin="0,0,0,5"/>
-            <PasswordBox x:Name="PasswordBox" 
+                <!-- Username -->
+                <TextBlock Text="Usuario o Email" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,8" FontWeight="SemiBold"/>
+                <TextBox x:Name="UsernameTextBox" 
                          Background="#1A1F3A" 
                          Foreground="#FFFFFF"
-                         Padding="10"
-                         Height="40"
-                         Margin="0,0,0,15"/>
+                         Padding="12"
+                         Height="42"
+                         Margin="0,0,0,18"
+                         BorderBrush="#2A3050"
+                         BorderThickness="1"
+                         FontSize="13"/>
 
-            <!-- Server IP -->
-            <TextBlock Text="Dirección IP del Servidor" Foreground="#A0A0A0" FontSize="12" Margin="0,0,0,5"/>
-            <TextBox x:Name="ServerIpTextBox" 
-                     Background="#1A1F3A" 
-                     Foreground="#FFFFFF"
-                     Padding="10"
-                     Height="40"
-                     Margin="0,0,0,15"
-                     Text="localhost:5000"/>
+                <!-- Password -->
+                <TextBlock Text="Contraseña" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,8" FontWeight="SemiBold"/>
+                <PasswordBox x:Name="PasswordBox" 
+                             Background="#1A1F3A" 
+                             Foreground="#FFFFFF"
+                             Padding="12"
+                             Height="42"
+                             Margin="0,0,0,18"
+                             BorderBrush="#2A3050"
+                             BorderThickness="1"
+                             FontSize="13"/>
 
-            <!-- Remember Me -->
-            <CheckBox x:Name="RememberMeCheckBox" 
-                      Content="Recuérdame" 
-                      Foreground="#FFFFFF"
-                      Margin="0,0,0,20"/>
+                <!-- Server IP -->
+                <TextBlock Text="Dirección IP del Servidor" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,8" FontWeight="SemiBold"/>
+                <TextBox x:Name="ServerIpTextBox" 
+                         Background="#1A1F3A" 
+                         Foreground="#FFFFFF"
+                         Padding="12"
+                         Height="42"
+                         Margin="0,0,0,18"
+                         BorderBrush="#2A3050"
+                         BorderThickness="1"
+                         Text="localhost:5000"
+                         FontSize="13"/>
 
-            <!-- Error Message -->
-            <TextBlock x:Name="ErrorMessageText" 
-                       Foreground="#FF3333" 
-                       TextWrapping="Wrap"
-                       Margin="0,0,0,15"
-                       Visibility="Collapsed"/>
+                <!-- Remember Me -->
+                <CheckBox x:Name="RememberMeCheckBox" 
+                          Content="Recuérdame" 
+                          Foreground="#A0A0A0"
+                          Margin="0,0,0,20"
+                          FontSize="12"/>
 
-            <!-- Login Button -->
-            <Button x:Name="LoginButton" 
-                    Content="Iniciar Sesión" 
-                    Background="#00D9FF"
-                    Foreground="#0A0E27"
-                    Padding="10"
-                    Height="40"
-                    FontWeight="Bold"
-                    Cursor="Hand"
-                    Margin="0,0,0,15"
-                    Click="LoginButton_Click"/>
+                <!-- Error Message -->
+                <TextBlock x:Name="ErrorMessageText" 
+                           Foreground="#FF3333" 
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,15"
+                           Visibility="Collapsed"
+                           FontSize="11"/>
 
-            <!-- Register Link -->
-            <TextBlock TextAlignment="Center" Margin="0,15,0,0">
-                <Run Text="¿No tienes cuenta? " Foreground="#A0A0A0"/>
-                <Hyperlink Foreground="#00D9FF" Click="RegisterLink_Click">Regístrate aquí</Hyperlink>
-            </TextBlock>
+                <!-- Login Button -->
+                <Button x:Name="LoginButton" 
+                        Content="Iniciar Sesión" 
+                        Background="#00D9FF"
+                        Foreground="#0A0E27"
+                        Padding="12"
+                        Height="44"
+                        FontWeight="Bold"
+                        Cursor="Hand"
+                        Margin="0,0,0,15"
+                        FontSize="13"
+                        Click="LoginButton_Click"
+                        BorderThickness="0"
+                        Style="{DynamicResource ModernButtonStyle}"/>
 
-            <!-- Forgot Password (Disabled) -->
-            <TextBlock TextAlignment="Center" Margin="0,10,0,0">
-                <Hyperlink Foreground="#666666" IsEnabled="False">¿Olvidaste contraseña?</Hyperlink>
-            </TextBlock>
-        </StackPanel>
+                <!-- Separator -->
+                <Grid Margin="0,0,0,15" Height="1">
+                    <Rectangle Fill="#2A3050" Opacity="0.5"/>
+                    <TextBlock Text="o" Foreground="#A0A0A0" HorizontalAlignment="Center" Background="#0A0E27" Padding="10,0" FontSize="11"/>
+                </Grid>
+
+                <!-- Register Link -->
+                <TextBlock TextAlignment="Center" Margin="0,0,0,20">
+                    <Run Text="¿No tienes cuenta? " Foreground="#A0A0A0" FontSize="11"/>
+                    <Hyperlink Foreground="#00D9FF" Click="RegisterLink_Click" FontSize="11" TextDecorations="None">
+                        <Run Text="Crea una aquí"/>
+                    </Hyperlink>
+                </TextBlock>
+
+                <!-- Forgot Password -->
+                <TextBlock TextAlignment="Center" Margin="0,0,0,0">
+                    <Hyperlink Foreground="#666666" IsEnabled="False" FontSize="10">¿Olvidaste tu contraseña?</Hyperlink>
+                </TextBlock>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

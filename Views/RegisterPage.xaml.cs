@@ -78,11 +78,8 @@ namespace LauncherPhantom.Views
             try
             {
                 Debug.WriteLine("[RegisterPage] Probando conexión con servidor...");
-                
-                // Update server URL from input
                 ServerManager.Instance.SetServerUrl($"http://{ServerIpTextBox.Text}");
                 
-                // Test connection
                 bool canConnect = await ServerManager.Instance.TestConnectionAsync();
                 if (!canConnect)
                 {
@@ -106,7 +103,6 @@ namespace LauncherPhantom.Views
                 if (response.Success)
                 {
                     Debug.WriteLine("[RegisterPage] Registro exitoso");
-                    
                     SoundManager.Instance.PlaySound("success");
                     MessageBox.Show("¡Cuenta creada exitosamente!\nRedirigiendo a Login...", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
                     
@@ -118,7 +114,6 @@ namespace LauncherPhantom.Views
                 else
                 {
                     Debug.WriteLine($"[RegisterPage] Registro fallo: {response.Error}");
-                    
                     SoundManager.Instance.PlaySound("error");
                     ShowError(response.Error ?? "Error desconocido");
                 }
@@ -126,7 +121,6 @@ namespace LauncherPhantom.Views
             catch (Exception ex)
             {
                 Debug.WriteLine($"[RegisterPage] ERROR: {ex.Message}");
-                
                 SoundManager.Instance.PlaySound("error");
                 ShowError($"Error: {ex.Message}");
             }
@@ -164,19 +158,16 @@ namespace LauncherPhantom.Views
                 if (mainWindow != null)
                 {
                     mainWindow.NavigateTo(new LoginPage());
-                    Debug.WriteLine("[RegisterPage] Navegación exitosa a LoginPage");
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[RegisterPage] Error al navegar: {ex.Message}");
-                MessageBox.Show($"Error al navegar: {ex.Message}");
             }
         }
 
         private (bool IsValid, string Message) ValidateInputs()
         {
-            // Username validation
             if (string.IsNullOrWhiteSpace(UsernameTextBox.Text))
                 return (false, "El usuario no puede estar vacío");
 
@@ -189,18 +180,15 @@ namespace LauncherPhantom.Views
             if (!Regex.IsMatch(UsernameTextBox.Text, @"^[a-zA-Z0-9_-]+$"))
                 return (false, "El usuario solo puede contener letras, números, guiones y guiones bajos");
 
-            // Email validation
             if (string.IsNullOrWhiteSpace(EmailTextBox.Text))
                 return (false, "El email no puede estar vacío");
 
             if (!Regex.IsMatch(EmailTextBox.Text, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
                 return (false, "Email inválido");
 
-            // Server IP validation
             if (string.IsNullOrWhiteSpace(ServerIpTextBox.Text))
                 return (false, "La dirección IP del servidor no puede estar vacía");
 
-            // Password validation
             if (string.IsNullOrWhiteSpace(PasswordBox.Password))
                 return (false, "La contraseña no puede estar vacía");
 
@@ -219,11 +207,9 @@ namespace LauncherPhantom.Views
             if (!Regex.IsMatch(PasswordBox.Password, "[^a-zA-Z0-9]"))
                 return (false, "La contraseña debe contener símbolos especiales");
 
-            // Confirm password validation
             if (PasswordBox.Password != ConfirmPasswordBox.Password)
                 return (false, "Las contraseñas no coinciden");
 
-            // Terms validation
             if (!TermsCheckBox.IsChecked.GetValueOrDefault())
                 return (false, "Debes aceptar los Términos y Condiciones");
 
