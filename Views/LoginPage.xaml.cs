@@ -65,6 +65,21 @@ namespace LauncherPhantom.Views
 
             try
             {
+                Debug.WriteLine("[LoginPage] Probando conexión con servidor...");
+                
+                // Update server URL from input
+                ServerManager.Instance.SetServerUrl($"http://{ServerIpTextBox.Text}");
+                
+                // Test connection
+                bool canConnect = await ServerManager.Instance.TestConnectionAsync();
+                if (!canConnect)
+                {
+                    ShowError("No se puede conectar con el servidor. Verifica la dirección IP.");
+                    LoginButton.IsEnabled = true;
+                    LoginButton.Content = "Iniciar Sesión";
+                    return;
+                }
+
                 Debug.WriteLine("[LoginPage] Enviando request de login...");
                 
                 var request = new LoginRequest
@@ -86,6 +101,8 @@ namespace LauncherPhantom.Views
                             EncryptionManager.Instance.Encrypt(UsernameTextBox.Text));
                         ConfigManager.Instance.SetSetting("saved_password", 
                             EncryptionManager.Instance.Encrypt(PasswordBox.Password));
+                        ConfigManager.Instance.SetSetting("server_url",
+                            $"http://{ServerIpTextBox.Text}");
                         
                         Debug.WriteLine("[LoginPage] Credenciales guardadas");
                     }
@@ -124,8 +141,20 @@ namespace LauncherPhantom.Views
         private void RegisterLink_Click(object sender, RoutedEventArgs e)
         {
             Debug.WriteLine("[LoginPage] Navegando a RegisterPage");
-            var mainWindow = Application.Current.MainWindow as MainWindow;
-            mainWindow?.NavigateTo(new RegisterPage());
+            try
+            {
+                var mainWindow = Application.Current.MainWindow as MainWindow;
+                if (mainWindow != null)
+                {
+                    mainWindow.NavigateTo(new RegisterPage());
+                    Debug.WriteLine("[LoginPage] Navegación exitosa a RegisterPage");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[LoginPage] Error al navegar: {ex.Message}");
+                MessageBox.Show($"Error al navegar: {ex.Message}");
+            }
         }
 
         private (bool IsValid, string Message) ValidateInputs()

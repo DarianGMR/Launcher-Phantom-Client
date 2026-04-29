@@ -77,6 +77,21 @@ namespace LauncherPhantom.Views
 
             try
             {
+                Debug.WriteLine("[RegisterPage] Probando conexión con servidor...");
+                
+                // Update server URL from input
+                ServerManager.Instance.SetServerUrl($"http://{ServerIpTextBox.Text}");
+                
+                // Test connection
+                bool canConnect = await ServerManager.Instance.TestConnectionAsync();
+                if (!canConnect)
+                {
+                    ShowError("No se puede conectar con el servidor. Verifica la dirección IP.");
+                    RegisterButton.IsEnabled = true;
+                    RegisterButton.Content = "Registrarse";
+                    return;
+                }
+
                 Debug.WriteLine("[RegisterPage] Enviando request de registro...");
                 
                 var request = new RegisterRequest
@@ -97,9 +112,8 @@ namespace LauncherPhantom.Views
                     
                     await Task.Delay(2000);
                     
-                    var loginPage = new LoginPage();
                     var mainWindow = Application.Current.MainWindow as MainWindow;
-                    mainWindow?.NavigateTo(loginPage);
+                    mainWindow?.NavigateTo(new LoginPage());
                 }
                 else
                 {
@@ -126,8 +140,20 @@ namespace LauncherPhantom.Views
         private void LoginLink_Click(object sender, RoutedEventArgs e)
         {
             Debug.WriteLine("[RegisterPage] Navegando a LoginPage");
-            var mainWindow = Application.Current.MainWindow as MainWindow;
-            mainWindow?.NavigateTo(new LoginPage());
+            try
+            {
+                var mainWindow = Application.Current.MainWindow as MainWindow;
+                if (mainWindow != null)
+                {
+                    mainWindow.NavigateTo(new LoginPage());
+                    Debug.WriteLine("[RegisterPage] Navegación exitosa a LoginPage");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[RegisterPage] Error al navegar: {ex.Message}");
+                MessageBox.Show($"Error al navegar: {ex.Message}");
+            }
         }
 
         private (bool IsValid, string Message) ValidateInputs()
@@ -170,7 +196,7 @@ namespace LauncherPhantom.Views
                 return (false, "La contraseña debe contener mayúsculas");
 
             if (!Regex.IsMatch(PasswordBox.Password, "[0-9]"))
-                return (false, "La contrase��a debe contener números");
+                return (false, "La contraseña debe contener números");
 
             if (!Regex.IsMatch(PasswordBox.Password, "[^a-zA-Z0-9]"))
                 return (false, "La contraseña debe contener símbolos especiales");

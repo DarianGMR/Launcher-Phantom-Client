@@ -33,20 +33,14 @@ namespace LauncherPhantom
             {
                 Debug.WriteLine("[MainWindow] Iniciando InitializeAsync...");
                 
-                // Show loading
-                ShowLoading(true);
-                Debug.WriteLine("[MainWindow] Loading mostrado");
+                // Hide loading - no connection test on startup
+                ShowLoading(false);
+                Debug.WriteLine("[MainWindow] Loading ocultado");
 
-                // Test server connection
-                Debug.WriteLine("[MainWindow] Probando conexión con servidor...");
-                bool canConnect = await ServerManager.Instance.TestConnectionAsync();
-                Debug.WriteLine($"[MainWindow] Conexión servidor: {(canConnect ? "OK" : "FALLO")}");
-                
-                // Navigate to login
+                // Navigate to login directly - NO server connection test here
                 Debug.WriteLine("[MainWindow] Navegando a LoginPage...");
                 MainFrame.Navigate(new LoginPage());
                 
-                ShowLoading(false);
                 Debug.WriteLine("[MainWindow] InitializeAsync completado");
             }
             catch (Exception ex)
@@ -81,6 +75,7 @@ namespace LauncherPhantom
             try
             {
                 MainFrame.Navigate(page);
+                MainFrame.RemoveBackEntry(); // Prevent going back
             }
             catch (Exception ex)
             {
