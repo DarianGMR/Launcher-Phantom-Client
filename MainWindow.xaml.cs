@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -10,6 +11,8 @@ namespace LauncherPhantom
 {
     public partial class MainWindow : Window
     {
+        private RotateTransform _spinnerRotate;
+
         public MainWindow()
         {
             try
@@ -128,19 +131,16 @@ namespace LauncherPhantom
 
         private void AnimateLoading()
         {
-            var bars = new[] { LoadBar1, LoadBar2, LoadBar3, LoadBar4, LoadBar5 };
-            
-            for (int i = 0; i < bars.Length; i++)
+            // Rotate the spinner
+            _spinnerRotate = new RotateTransform();
+            LoadingSpinner.RenderTransform = _spinnerRotate;
+            LoadingSpinner.RenderTransformOrigin = new Point(0.5, 0.5);
+
+            var rotateAnim = new DoubleAnimation(0, 360, TimeSpan.FromSeconds(2))
             {
-                var bar = bars[i];
-                var animation = new DoubleAnimation(0, 100, TimeSpan.FromSeconds(1.5))
-                {
-                    BeginTime = TimeSpan.FromMilliseconds(i * 150),
-                    RepeatBehavior = RepeatBehavior.Forever,
-                    AutoReverse = true
-                };
-                bar.BeginAnimation(ProgressBar.ValueProperty, animation);
-            }
+                RepeatBehavior = RepeatBehavior.Forever
+            };
+            _spinnerRotate.BeginAnimation(RotateTransform.AngleProperty, rotateAnim);
         }
 
         public void NavigateTo(Page page)
@@ -161,7 +161,7 @@ namespace LauncherPhantom
         private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2)
-                return; // Prevent double-click to maximize
+                return;
             
             DragMove();
         }

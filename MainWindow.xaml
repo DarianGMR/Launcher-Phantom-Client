@@ -4,10 +4,6 @@
         Title="Launcher Phantom" 
         Width="640" 
         Height="480"
-        MinWidth="640"
-        MinHeight="480"
-        MaxWidth="640"
-        MaxHeight="480"
         WindowStartupLocation="CenterScreen"
         Background="#0A0E27"
         Foreground="#FFFFFF"
@@ -32,7 +28,7 @@
             
             <!-- Title and Icon -->
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
-                <TextBlock Text="◆" Foreground="#00D9FF" FontSize="14" FontWeight="Bold" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <Image Source="pack://application:,,,/Resources/Images/icon.ico" Width="18" Height="18" Margin="0,0,8,0" VerticalAlignment="Center"/>
                 <TextBlock Text="LAUNCHER PHANTOM" Foreground="#00D9FF" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" Opacity="0.95"/>
             </StackPanel>
             
@@ -113,49 +109,49 @@
                   Opacity="1"
                   Visibility="Collapsed">
                 
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="280">
-                    <!-- Animated Logo -->
-                    <TextBlock Text="◆" 
-                               Foreground="#00D9FF" 
-                               FontSize="40"
-                               TextAlignment="Center"
-                               Margin="0,0,0,12"
-                               x:Name="AnimatedLogo"
-                               FontWeight="Bold"/>
+                <!-- Animated Background -->
+                <Canvas Background="#0A0E27">
+                    <Ellipse Width="600" Height="600" Fill="#00D9FF" Opacity="0.04" Canvas.Left="-150" Canvas.Top="-150"/>
+                    <Ellipse Width="500" Height="500" Fill="#7B2CBF" Opacity="0.05" Canvas.Right="-200" Canvas.Bottom="-200"/>
+                </Canvas>
+                
+                <!-- Content -->
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="420">
+                    <!-- Icon/Image -->
+                    <Image x:Name="LoadingIconImage" Source="pack://application:,,,/Resources/Images/icon.ico" Width="120" Height="120" Margin="0,0,0,30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     
                     <!-- Title -->
                     <TextBlock Text="LAUNCHER PHANTOM" 
                                Foreground="#00D9FF" 
-                               FontSize="16"
+                               FontSize="24"
                                FontWeight="Bold"
                                TextAlignment="Center"
-                               Margin="0,0,0,20"
+                               Margin="0,0,0,40"
                                Opacity="0.95"/>
                     
-                    <!-- Animated Loading Bars -->
-                    <Grid Margin="0,0,0,16" Height="40">
+                    <!-- Rotating Loader Animation -->
+                    <Grid Width="100" Height="100" HorizontalAlignment="Center" Margin="0,0,0,30">
                         <Canvas>
-                            <ProgressBar x:Name="LoadBar1" Width="20" Height="2" Foreground="#00D9FF" Canvas.Left="6" Canvas.Top="8"/>
-                            <ProgressBar x:Name="LoadBar2" Width="20" Height="2" Foreground="#7B2CBF" Canvas.Left="32" Canvas.Top="8"/>
-                            <ProgressBar x:Name="LoadBar3" Width="20" Height="2" Foreground="#39FF14" Canvas.Left="58" Canvas.Top="8"/>
-                            <ProgressBar x:Name="LoadBar4" Width="20" Height="2" Foreground="#00D9FF" Canvas.Left="84" Canvas.Top="8"/>
-                            <ProgressBar x:Name="LoadBar5" Width="20" Height="2" Foreground="#FFB800" Canvas.Left="110" Canvas.Top="8"/>
+                            <!-- Outer Circle -->
+                            <Ellipse Canvas.Left="20" Canvas.Top="20" Width="60" Height="60" Stroke="#00D9FF" StrokeThickness="2" Fill="Transparent" Opacity="0.3"/>
+                            <!-- Rotating Element -->
+                            <Ellipse x:Name="LoadingSpinner" Canvas.Left="48" Canvas.Top="10" Width="4" Height="4" Fill="#00D9FF" OpacityMask="#00D9FF"/>
                         </Canvas>
                     </Grid>
                     
-                    <!-- Loading Text -->
+                    <!-- Status Text -->
                     <TextBlock x:Name="LoadingText" 
                                Text="Cargando recursos..." 
                                Foreground="#A0A0A0" 
-                               FontSize="11"
+                               FontSize="12"
                                TextAlignment="Center"
                                Margin="0,0,0,8"/>
                     
-                    <!-- Percentage -->
+                    <!-- Loading Text Animation -->
                     <TextBlock x:Name="LoadingPercentage" 
                                Text="0%" 
                                Foreground="#00D9FF" 
-                               FontSize="13"
+                               FontSize="16"
                                FontWeight="Bold"
                                TextAlignment="Center"/>
                 </StackPanel>
@@ -163,56 +159,48 @@
 
             <!-- Splash Screen (top layer) -->
             <Grid x:Name="SplashScreen" Background="#0A0E27">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="300">
+                <!-- Animated Background -->
+                <Canvas Background="#0A0E27">
+                    <Ellipse Width="600" Height="600" Fill="#00D9FF" Opacity="0.04" Canvas.Left="-150" Canvas.Top="-150"/>
+                    <Ellipse Width="500" Height="500" Fill="#7B2CBF" Opacity="0.05" Canvas.Right="-200" Canvas.Bottom="-200"/>
+                    <Ellipse Width="400" Height="400" Fill="#39FF14" Opacity="0.03" Canvas.Left="100" Canvas.Bottom="-100"/>
+                </Canvas>
+                
+                <!-- Content -->
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="420">
                     <!-- Logo -->
-                    <TextBlock Text="◆◆◆" 
-                               Foreground="#00D9FF" 
-                               FontSize="40"
-                               TextAlignment="Center"
-                               Margin="0,0,0,16"
-                               FontWeight="Bold"
-                               Opacity="0.95"/>
+                    <Image x:Name="SplashIconImage" Source="pack://application:,,,/Resources/Images/icon.ico" Width="140" Height="140" Margin="0,0,0,35" HorizontalAlignment="Center"/>
                     
                     <!-- Title -->
                     <TextBlock Text="LAUNCHER" 
                                Foreground="#00D9FF" 
-                               FontSize="18"
+                               FontSize="28"
                                FontWeight="Bold"
                                TextAlignment="Center"
-                               Margin="0,0,0,2"/>
+                               Margin="0,0,0,3"/>
                     
                     <TextBlock Text="PHANTOM" 
                                Foreground="#39FF14" 
-                               FontSize="18"
+                               FontSize="28"
                                FontWeight="Bold"
                                TextAlignment="Center"
-                               Margin="0,0,0,16"/>
+                               Margin="0,0,0,30"/>
                     
                     <!-- Progress Bar -->
                     <ProgressBar x:Name="SplashProgressBar" 
-                                 Width="220" 
-                                 Height="5" 
+                                 Width="300" 
+                                 Height="6" 
                                  Foreground="#00D9FF"
                                  Background="#1A1F3A"
-                                 Margin="0,0,0,12"
+                                 Margin="0,0,0,20"
                                  Value="0"/>
                     
                     <!-- Status Text -->
                     <TextBlock Text="Inicializando..." 
                                Foreground="#A0A0A0" 
-                               FontSize="10"
+                               FontSize="12"
                                TextAlignment="Center"
-                               Margin="0,0,0,8"
                                x:Name="SplashStatus"/>
-                    
-                    <!-- Animated Progress -->
-                    <ProgressBar x:Name="SplashDotsProgress" 
-                                 Width="60" 
-                                 Height="2" 
-                                 Foreground="#7B2CBF"
-                                 Background="#1A1F3A"
-                                 HorizontalAlignment="Center"
-                                 IsIndeterminate="True"/>
                 </StackPanel>
             </Grid>
         </Grid>

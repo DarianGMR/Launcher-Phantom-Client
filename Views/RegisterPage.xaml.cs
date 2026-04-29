@@ -207,9 +207,6 @@ namespace LauncherPhantom.Views
             if (!Regex.IsMatch(PasswordBox.Password, "[^a-zA-Z0-9]"))
                 return (false, "La contraseña debe contener símbolos especiales");
 
-            if (PasswordBox.Password != ConfirmPasswordBox.Password)
-                return (false, "Las contraseñas no coinciden");
-
             if (!TermsCheckBox.IsChecked.GetValueOrDefault())
                 return (false, "Debes aceptar los Términos y Condiciones");
 
