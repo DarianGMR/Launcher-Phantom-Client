@@ -1,0 +1,65 @@
+<Window x:Class="LauncherPhantom.Views.UpdateDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Actualización Disponible"
+        Width="500"
+        Height="300"
+        WindowStartupLocation="CenterOwner"
+        Background="#0A0E27"
+        Foreground="#FFFFFF"
+        WindowStyle="ToolWindow"
+        ResizeMode="NoResize">
+    
+    <Grid Margin="20">
+        <StackPanel VerticalAlignment="Center">
+            <!-- Title -->
+            <TextBlock Text="¡Actualización Disponible!" 
+                       FontSize="24" 
+                       FontWeight="Bold"
+                       Foreground="#00D9FF"
+                       Margin="0,0,0,20"
+                       FontFamily="pack://application:,,,/Resources/Fonts/#Orbitron"/>
+
+            <!-- Version Info -->
+            <TextBlock x:Name="VersionInfoText" 
+                       Foreground="#A0A0A0" 
+                       FontSize="14"
+                       Margin="0,0,0,15"
+                       TextWrapping="Wrap"/>
+
+            <!-- Changes -->
+            <TextBlock Text="Cambios:" 
+                       Foreground="#FFFFFF" 
+                       FontSize="12"
+                       Margin="0,0,0,10"
+                       FontWeight="Bold"/>
+            <TextBlock x:Name="ChangesText" 
+                       Foreground="#A0A0A0" 
+                       FontSize="12"
+                       Margin="0,0,0,20"
+                       TextWrapping="Wrap"
+                       MaxHeight="100"
+                       Padding="10"
+                       Background="#1A1F3A"/>
+
+            <!-- Buttons -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="DownloadButton" 
+                        Content="Descargar Ahora" 
+                        Background="#00D9FF"
+                        Foreground="#0A0E27"
+                        Padding="20,10"
+                        Margin="0,0,10,0"
+                        Cursor="Hand"
+                        Click="DownloadButton_Click"/>
+                <Button x:Name="LaterButton" 
+                        Content="Más Tarde" 
+                        Background="#1A1F3A"
+                        Foreground="#FFFFFF"
+                        Padding="20,10"
+                        Cursor="Hand"
+                        Click="LaterButton_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

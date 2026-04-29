@@ -1,0 +1,44 @@
+<Window x:Class="LauncherPhantom.Views.DownloadProgressWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Descargando Actualización"
+        Width="500"
+        Height="200"
+        WindowStartupLocation="CenterOwner"
+        Background="#0A0E27"
+        Foreground="#FFFFFF"
+        WindowStyle="ToolWindow"
+        ResizeMode="NoResize"
+        Closing="Window_Closing">
+    
+    <Grid Margin="20">
+        <StackPanel VerticalAlignment="Center">
+            <!-- Title -->
+            <TextBlock Text="Descargando Actualización" 
+                       FontSize="18" 
+                       FontWeight="Bold"
+                       Foreground="#00D9FF"
+                       Margin="0,0,0,20"/>
+
+            <!-- Progress Bar -->
+            <ProgressBar x:Name="ProgressBar" 
+                         Height="20" 
+                         Foreground="#00D9FF"
+                         Background="#1A1F3A"
+                         Margin="0,0,0,15"/>
+
+            <!-- Progress Text -->
+            <TextBlock x:Name="ProgressText" 
+                       Foreground="#A0A0A0" 
+                       FontSize="12"
+                       TextAlignment="Center"
+                       Margin="0,0,0,15"/>
+
+            <!-- Status -->
+            <TextBlock x:Name="StatusText" 
+                       Foreground="#00D9FF" 
+                       FontSize="12"
+                       TextAlignment="Center"/>
+        </StackPanel>
+    </Grid>
+</Window>
