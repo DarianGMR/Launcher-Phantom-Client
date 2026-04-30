@@ -46,7 +46,7 @@
                 </Setter>
             </Style>
 
-            <!-- TextBox Styles -->
+            <!-- TextBox Styles with Placeholder -->
             <Style TargetType="TextBox">
                 <Setter Property="Background" Value="#1A1F3A"/>
                 <Setter Property="Foreground" Value="#FFFFFF"/>
@@ -56,6 +56,7 @@
                 <Setter Property="BorderBrush" Value="#2A3050"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="CaretBrush" Value="#00D9FF"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="TextBox">
@@ -64,9 +65,77 @@
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     CornerRadius="4"
                                     Padding="0">
-                                <ScrollViewer x:Name="PART_ContentHost" 
-                                              VerticalAlignment="Center"
-                                              Margin="{TemplateBinding Padding}"/>
+                                <Grid>
+                                    <TextBlock x:Name="PlaceholderText" 
+                                               Text="{TemplateBinding Tag}" 
+                                               Foreground="#6B7280" 
+                                               Margin="12,0,0,0"
+                                               VerticalAlignment="Center"
+                                               FontSize="12"
+                                               IsHitTestVisible="False"/>
+                                    <ScrollViewer x:Name="PART_ContentHost" 
+                                                  VerticalAlignment="Center"
+                                                  Margin="{TemplateBinding Padding}"/>
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsFocused" Value="True">
+                                    <Setter Property="BorderBrush" Value="#00D9FF"/>
+                                    <Setter Property="Background" Value="#1F2540"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="BorderBrush" Value="#003D5C"/>
+                                </Trigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="Text" Value=""/>
+                                    </MultiTrigger.Conditions>
+                                    <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible"/>
+                                </MultiTrigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="Text" Value=""/>
+                                        <Condition Property="IsFocused" Value="False"/>
+                                    </MultiTrigger.Conditions>
+                                    <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible"/>
+                                </MultiTrigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- PasswordBox Styles with Placeholder -->
+            <Style TargetType="PasswordBox">
+                <Setter Property="Background" Value="#1A1F3A"/>
+                <Setter Property="Foreground" Value="#FFFFFF"/>
+                <Setter Property="Padding" Value="12"/>
+                <Setter Property="Height" Value="40"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="BorderBrush" Value="#2A3050"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="CaretBrush" Value="#00D9FF"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="PasswordBox">
+                            <Border Background="{TemplateBinding Background}" 
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="4"
+                                    Padding="0">
+                                <Grid>
+                                    <TextBlock x:Name="PlaceholderText" 
+                                               Text="{TemplateBinding Tag}" 
+                                               Foreground="#6B7280" 
+                                               Margin="12,0,0,0"
+                                               VerticalAlignment="Center"
+                                               FontSize="12"
+                                               IsHitTestVisible="False"/>
+                                    <ScrollViewer x:Name="PART_ContentHost" 
+                                                  VerticalAlignment="Center"
+                                                  Margin="{TemplateBinding Padding}"/>
+                                </Grid>
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsFocused" Value="True">
@@ -80,18 +149,6 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
-            </Style>
-
-            <!-- PasswordBox Styles -->
-            <Style TargetType="PasswordBox">
-                <Setter Property="Background" Value="#1A1F3A"/>
-                <Setter Property="Foreground" Value="#FFFFFF"/>
-                <Setter Property="Padding" Value="12"/>
-                <Setter Property="Height" Value="40"/>
-                <Setter Property="FontSize" Value="12"/>
-                <Setter Property="BorderBrush" Value="#2A3050"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="CaretBrush" Value="#00D9FF"/>
             </Style>
 
             <!-- CheckBox Styles -->

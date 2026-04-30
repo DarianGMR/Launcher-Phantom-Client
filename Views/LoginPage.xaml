@@ -69,7 +69,8 @@
                          Margin="0,0,0,14"
                          BorderBrush="#2A3050"
                          BorderThickness="1"
-                         FontSize="12"/>
+                         FontSize="12"
+                         Tag="Ingresa tu usuario"/>
 
                 <!-- Password -->
                 <TextBlock Text="Contraseña" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
@@ -81,7 +82,8 @@
                              Margin="0,0,0,14"
                              BorderBrush="#2A3050"
                              BorderThickness="1"
-                             FontSize="12"/>
+                             FontSize="12"
+                             Tag="Ingresa tu contraseña"/>
 
                 <!-- Server IP -->
                 <TextBlock Text="IP del Servidor" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
@@ -93,8 +95,8 @@
                          Margin="0,0,0,14"
                          BorderBrush="#2A3050"
                          BorderThickness="1"
-                         Text="localhost:5000"
-                         FontSize="12"/>
+                         FontSize="12"
+                         Tag="ej: localhost:5000"/>
 
                 <!-- Remember Me -->
                 <CheckBox x:Name="RememberMeCheckBox" 

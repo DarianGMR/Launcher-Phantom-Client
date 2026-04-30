@@ -82,7 +82,8 @@
                              Margin="0,0,0,14"
                              BorderBrush="#2A3050"
                              BorderThickness="1"
-                             FontSize="12"/>
+                             FontSize="12"
+                             Tag="Ingresa tu usuario"/>
 
                     <!-- Email -->
                     <TextBlock Text="Email" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
@@ -94,7 +95,8 @@
                              Margin="0,0,0,14"
                              BorderBrush="#2A3050"
                              BorderThickness="1"
-                             FontSize="12"/>
+                             FontSize="12"
+                             Tag="ejemplo@email.com"/>
 
                     <!-- Server IP -->
                     <TextBlock Text="IP del Servidor" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
@@ -106,8 +108,8 @@
                              Margin="0,0,0,14"
                              BorderBrush="#2A3050"
                              BorderThickness="1"
-                             Text="localhost:5000"
-                             FontSize="12"/>
+                             FontSize="12"
+                             Tag="ej: localhost:5000"/>
 
                     <!-- Password -->
                     <TextBlock Text="Contraseña" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
@@ -119,24 +121,25 @@
                                  Margin="0,0,0,8"
                                  BorderBrush="#2A3050"
                                  BorderThickness="1"
-                                 FontSize="12"/>
+                                 FontSize="12"
+                                 Tag="Ingresa tu contraseña"/>
 
                     <!-- Password Strength -->
                     <ProgressBar x:Name="PasswordStrengthBar" 
                                  Height="3" 
                                  Background="#1A1F3A"
                                  Foreground="#FF3333"
-                                 Margin="0,0,0,4"/>
+                                 Margin="0,0,0,0"/>
                     <TextBlock x:Name="PasswordStrengthText" 
                                Foreground="#A0A0A0" 
                                FontSize="9" 
-                               Margin="0,0,0,4"/>
+                               Margin="0,0,0,6"/>
 
                     <!-- Terms -->
                     <CheckBox x:Name="TermsCheckBox" 
                               Foreground="#A0A0A0"
                               Margin="0,0,0,14"
-                              FontSize="10">
+                              FontSize="12">
                         <TextBlock TextWrapping="Wrap">
                             <Run Text="Aceptar "/>
                             <Hyperlink Foreground="#39FF14" Click="TermsLink_Click" TextDecorations="None">

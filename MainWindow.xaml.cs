@@ -11,7 +11,7 @@ namespace LauncherPhantom
 {
     public partial class MainWindow : Window
     {
-        private RotateTransform _spinnerRotate;
+        private RotateTransform? _spinnerRotate;
 
         public MainWindow()
         {
