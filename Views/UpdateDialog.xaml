@@ -17,8 +17,7 @@
                        FontSize="24" 
                        FontWeight="Bold"
                        Foreground="#00D9FF"
-                       Margin="0,0,0,20"
-                       FontFamily="pack://application:,,,/Resources/Fonts/#Orbitron"/>
+                       Margin="0,0,0,20"/>
 
             <!-- Version Info -->
             <TextBlock x:Name="VersionInfoText" 
