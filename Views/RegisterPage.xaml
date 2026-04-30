@@ -83,11 +83,14 @@
                              BorderBrush="#2A3050"
                              BorderThickness="1"
                              FontSize="12"
-                             Tag="Nombre de usuario"/>
+                             Tag="Nombre de usuario"
+                             TextChanged="UsernameTextBox_TextChanged"
+                             GotFocus="UsernameTextBox_GotFocus"
+                             LostFocus="UsernameTextBox_LostFocus"/>
 
-                    <!-- Gmail -->
-                    <TextBlock Text="Gmail" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
-                    <TextBox x:Name="GmailTextBox" 
+                    <!-- Email -->
+                    <TextBlock Text="Email" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
+                    <TextBox x:Name="EmailTextBox" 
                              Background="#1A1F3A" 
                              Foreground="#FFFFFF"
                              Padding="12"
@@ -96,10 +99,13 @@
                              BorderBrush="#2A3050"
                              BorderThickness="1"
                              FontSize="12"
-                             Tag="tu.gmail@gmail.com"/>
+                             Tag="tu.email@gmail.com"
+                             TextChanged="EmailTextBox_TextChanged"
+                             GotFocus="EmailTextBox_GotFocus"
+                             LostFocus="EmailTextBox_LostFocus"/>
 
                     <!-- Server IP -->
-                    <TextBlock Text="Direccion IP" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
+                    <TextBlock Text="Dirección IP" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
                     <TextBox x:Name="ServerIpTextBox" 
                              Background="#1A1F3A" 
                              Foreground="#FFFFFF"
@@ -109,7 +115,10 @@
                              BorderBrush="#2A3050"
                              BorderThickness="1"
                              FontSize="12"
-                             Tag="Direccion ip del servidor"/>
+                             Tag="Dirección IP del servidor"
+                             TextChanged="ServerIpTextBox_TextChanged"
+                             GotFocus="ServerIpTextBox_GotFocus"
+                             LostFocus="ServerIpTextBox_LostFocus"/>
 
                     <!-- Password -->
                     <TextBlock Text="Contraseña" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
@@ -122,7 +131,10 @@
                                  BorderBrush="#2A3050"
                                  BorderThickness="1"
                                  FontSize="12"
-                                 Tag="Ingresa una contraseña"/>
+                                 Tag="Ingresa una contraseña"
+                                 PasswordChanged="PasswordBox_PasswordChanged"
+                                 GotFocus="PasswordBox_GotFocus"
+                                 LostFocus="PasswordBox_LostFocus"/>
 
                     <!-- Password Strength -->
                     <ProgressBar x:Name="PasswordStrengthBar" 

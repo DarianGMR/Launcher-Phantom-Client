@@ -46,7 +46,7 @@
                 </Setter>
             </Style>
 
-            <!-- TextBox Styles with Working Placeholder -->
+            <!-- TextBox Styles with Placeholder -->
             <Style TargetType="TextBox">
                 <Setter Property="Background" Value="#1A1F3A"/>
                 <Setter Property="Foreground" Value="#FFFFFF"/>
@@ -65,7 +65,7 @@
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     CornerRadius="4">
                                 <Grid>
-                                    <!-- Placeholder Text - Layered behind -->
+                                    <!-- Placeholder Text -->
                                     <TextBlock x:Name="PlaceholderText" 
                                                Text="{TemplateBinding Tag}" 
                                                Foreground="#6B7280" 
@@ -74,38 +74,17 @@
                                                FontSize="12"
                                                IsHitTestVisible="False"
                                                Visibility="Collapsed"/>
-                                    <!-- Content Host - In Front -->
+                                    <!-- Content Host -->
                                     <ScrollViewer x:Name="PART_ContentHost" 
                                                   VerticalAlignment="Center"
                                                   Padding="{TemplateBinding Padding}"/>
                                 </Grid>
                             </Border>
                             <ControlTemplate.Triggers>
-                                <!-- Show placeholder when empty and not focused -->
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="Text" Value=""/>
-                                        <Condition Property="IsFocused" Value="False"/>
-                                    </MultiTrigger.Conditions>
-                                    <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible"/>
-                                </MultiTrigger>
-                                <!-- Show placeholder when empty even if focused -->
-                                <Trigger Property="Text" Value="">
-                                    <Trigger.EnterActions>
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="PlaceholderText" Storyboard.TargetProperty="Visibility">
-                                                    <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Visible}"/>
-                                                </ObjectAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </Trigger.EnterActions>
-                                </Trigger>
                                 <!-- Focus styling -->
                                 <Trigger Property="IsFocused" Value="True">
                                     <Setter Property="BorderBrush" Value="#00D9FF"/>
                                     <Setter Property="Background" Value="#1F2540"/>
-                                    <Setter TargetName="PlaceholderText" Property="Visibility" Value="Collapsed"/>
                                 </Trigger>
                                 <!-- Hover styling -->
                                 <Trigger Property="IsMouseOver" Value="True">
@@ -117,7 +96,7 @@
                 </Setter>
             </Style>
 
-            <!-- PasswordBox Styles with Working Placeholder -->
+            <!-- PasswordBox Styles with Placeholder -->
             <Style TargetType="PasswordBox">
                 <Setter Property="Background" Value="#1A1F3A"/>
                 <Setter Property="Foreground" Value="#FFFFFF"/>
@@ -136,7 +115,7 @@
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     CornerRadius="4">
                                 <Grid>
-                                    <!-- Placeholder Text - Layered behind -->
+                                    <!-- Placeholder Text -->
                                     <TextBlock x:Name="PlaceholderText" 
                                                Text="{TemplateBinding Tag}" 
                                                Foreground="#6B7280" 
@@ -145,7 +124,7 @@
                                                FontSize="12"
                                                IsHitTestVisible="False"
                                                Visibility="Collapsed"/>
-                                    <!-- Content Host - In Front -->
+                                    <!-- Content Host -->
                                     <ScrollViewer x:Name="PART_ContentHost" 
                                                   VerticalAlignment="Center"
                                                   Padding="{TemplateBinding Padding}"/>
@@ -156,7 +135,6 @@
                                 <Trigger Property="IsFocused" Value="True">
                                     <Setter Property="BorderBrush" Value="#00D9FF"/>
                                     <Setter Property="Background" Value="#1F2540"/>
-                                    <Setter TargetName="PlaceholderText" Property="Visibility" Value="Collapsed"/>
                                 </Trigger>
                                 <!-- Hover styling -->
                                 <Trigger Property="IsMouseOver" Value="True">

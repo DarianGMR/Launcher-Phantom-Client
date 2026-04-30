@@ -15,11 +15,104 @@ namespace LauncherPhantom.Views
         {
             InitializeComponent();
             PasswordBox.PasswordChanged += PasswordBox_PasswordChanged;
+            Loaded += RegisterPage_Loaded;
         }
 
+        private void RegisterPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        // Username TextBox Events
+        private void UsernameTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        private void UsernameTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        private void UsernameTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        // Email TextBox Events
+        private void EmailTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        private void EmailTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        private void EmailTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        // Server IP TextBox Events
+        private void ServerIpTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        private void ServerIpTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        private void ServerIpTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        // Password PasswordBox Events
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
             UpdatePasswordStrength(PasswordBox.Password);
+            UpdatePlaceholders();
+        }
+
+        private void PasswordBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        private void PasswordBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        private void UpdatePlaceholders()
+        {
+            // Update Username placeholder
+            if (UsernameTextBox.Template.FindName("PlaceholderText", UsernameTextBox) is TextBlock usernamePlaceholder)
+            {
+                usernamePlaceholder.Visibility = string.IsNullOrEmpty(UsernameTextBox.Text) ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            // Update Email placeholder
+            if (EmailTextBox.Template.FindName("PlaceholderText", EmailTextBox) is TextBlock emailPlaceholder)
+            {
+                emailPlaceholder.Visibility = string.IsNullOrEmpty(EmailTextBox.Text) ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            // Update Server IP placeholder
+            if (ServerIpTextBox.Template.FindName("PlaceholderText", ServerIpTextBox) is TextBlock serverIpPlaceholder)
+            {
+                serverIpPlaceholder.Visibility = string.IsNullOrEmpty(ServerIpTextBox.Text) ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            // Update Password placeholder
+            if (PasswordBox.Template.FindName("PlaceholderText", PasswordBox) is TextBlock passwordPlaceholder)
+            {
+                passwordPlaceholder.Visibility = string.IsNullOrEmpty(PasswordBox.Password) ? Visibility.Visible : Visibility.Collapsed;
+            }
         }
 
         private void UpdatePasswordStrength(string password)
@@ -94,7 +187,7 @@ namespace LauncherPhantom.Views
                 var request = new RegisterRequest
                 {
                     Username = UsernameTextBox.Text,
-                    Gmail = GmailTextBox.Text,
+                    Email = EmailTextBox.Text,
                     Password = PasswordBox.Password
                 };
 
@@ -180,11 +273,11 @@ namespace LauncherPhantom.Views
             if (!Regex.IsMatch(UsernameTextBox.Text, @"^[a-zA-Z0-9_-]+$"))
                 return (false, "El usuario solo puede contener letras, números, guiones y guiones bajos");
 
-            if (string.IsNullOrWhiteSpace(GmailTextBox.Text))
-                return (false, "El Gmail no puede estar vacío");
+            if (string.IsNullOrWhiteSpace(EmailTextBox.Text))
+                return (false, "El Email no puede estar vacío");
 
-            if (!Regex.IsMatch(GmailTextBox.Text, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-                return (false, "Gmail inválido");
+            if (!Regex.IsMatch(EmailTextBox.Text, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                return (false, "Email inválido");
 
             if (string.IsNullOrWhiteSpace(ServerIpTextBox.Text))
                 return (false, "La dirección IP del servidor no puede estar vacía");

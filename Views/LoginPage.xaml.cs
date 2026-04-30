@@ -44,10 +44,84 @@ namespace LauncherPhantom.Views
                     
                     Debug.WriteLine("[LoginPage] Credenciales pre-llenadas");
                 }
+                else
+                {
+                    // Show placeholders when empty
+                    UpdatePlaceholders();
+                }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[LoginPage] Error en LoadedEvent: {ex.Message}");
+            }
+        }
+
+        // Username TextBox Events
+        private void UsernameTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        private void UsernameTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        private void UsernameTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        // Password TextBox Events
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        private void PasswordBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        private void PasswordBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        // Server IP TextBox Events
+        private void ServerIpTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        private void ServerIpTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        private void ServerIpTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            UpdatePlaceholders();
+        }
+
+        private void UpdatePlaceholders()
+        {
+            // Update Username placeholder
+            if (UsernameTextBox.Template.FindName("PlaceholderText", UsernameTextBox) is TextBlock usernamePlaceholder)
+            {
+                usernamePlaceholder.Visibility = string.IsNullOrEmpty(UsernameTextBox.Text) ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            // Update Password placeholder
+            if (PasswordBox.Template.FindName("PlaceholderText", PasswordBox) is TextBlock passwordPlaceholder)
+            {
+                passwordPlaceholder.Visibility = string.IsNullOrEmpty(PasswordBox.Password) ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            // Update Server IP placeholder
+            if (ServerIpTextBox.Template.FindName("PlaceholderText", ServerIpTextBox) is TextBlock serverIpPlaceholder)
+            {
+                serverIpPlaceholder.Visibility = string.IsNullOrEmpty(ServerIpTextBox.Text) ? Visibility.Visible : Visibility.Collapsed;
             }
         }
 
