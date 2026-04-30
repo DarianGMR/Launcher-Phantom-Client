@@ -60,7 +60,7 @@
                            TextAlignment="Center"/>
 
                 <!-- Username -->
-                <TextBlock Text="Usuario o Email" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
+                <TextBlock Text="Usuario" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
                 <TextBox x:Name="UsernameTextBox" 
                          Background="#1A1F3A" 
                          Foreground="#FFFFFF"
@@ -86,7 +86,7 @@
                              Tag="Ingresa tu contraseña"/>
 
                 <!-- Server IP -->
-                <TextBlock Text="IP del Servidor" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
+                <TextBlock Text="Direccion IP" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
                 <TextBox x:Name="ServerIpTextBox" 
                          Background="#1A1F3A" 
                          Foreground="#FFFFFF"
@@ -96,7 +96,7 @@
                          BorderBrush="#2A3050"
                          BorderThickness="1"
                          FontSize="12"
-                         Tag="ej: localhost:5000"/>
+                         Tag="Direccion ip del servidor"/>
 
                 <!-- Remember Me -->
                 <CheckBox x:Name="RememberMeCheckBox" 
@@ -136,8 +136,8 @@
 
                 <!-- Register Link -->
                 <TextBlock TextAlignment="Center" Margin="0,0,0,0">
-                    <Run Text="¿No tienes cuenta? " Foreground="#A0A0A0" FontSize="10"/>
-                    <Hyperlink Foreground="#00D9FF" Click="RegisterLink_Click" FontSize="10" TextDecorations="None">
+                    <Run Text="¿No tienes cuenta? " Foreground="#A0A0A0" FontSize="14"/>
+                    <Hyperlink Foreground="#00D9FF" Click="RegisterLink_Click" FontSize="14" TextDecorations="None">
                         <Run Text="Regístrate"/>
                     </Hyperlink>
                 </TextBlock>

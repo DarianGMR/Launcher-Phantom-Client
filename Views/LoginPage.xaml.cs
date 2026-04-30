@@ -75,7 +75,7 @@ namespace LauncherPhantom.Views
                 bool canConnect = await ServerManager.Instance.TestConnectionAsync();
                 if (!canConnect)
                 {
-                    ShowError("No se puede conectar con el servidor. Verifica la dirección IP.");
+                    ShowError("No se puede conectar con el servidor.");
                     LoginButton.IsEnabled = true;
                     LoginButton.Content = "Iniciar Sesión";
                     return;

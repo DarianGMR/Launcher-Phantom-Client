@@ -94,7 +94,7 @@ namespace LauncherPhantom.Views
                 var request = new RegisterRequest
                 {
                     Username = UsernameTextBox.Text,
-                    Email = EmailTextBox.Text,
+                    Gmail = GmailTextBox.Text,
                     Password = PasswordBox.Password
                 };
 
@@ -180,11 +180,11 @@ namespace LauncherPhantom.Views
             if (!Regex.IsMatch(UsernameTextBox.Text, @"^[a-zA-Z0-9_-]+$"))
                 return (false, "El usuario solo puede contener letras, números, guiones y guiones bajos");
 
-            if (string.IsNullOrWhiteSpace(EmailTextBox.Text))
-                return (false, "El email no puede estar vacío");
+            if (string.IsNullOrWhiteSpace(GmailTextBox.Text))
+                return (false, "El Gmail no puede estar vacío");
 
-            if (!Regex.IsMatch(EmailTextBox.Text, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-                return (false, "Email inválido");
+            if (!Regex.IsMatch(GmailTextBox.Text, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                return (false, "Gmail inválido");
 
             if (string.IsNullOrWhiteSpace(ServerIpTextBox.Text))
                 return (false, "La dirección IP del servidor no puede estar vacía");

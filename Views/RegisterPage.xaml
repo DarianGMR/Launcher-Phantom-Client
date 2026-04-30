@@ -83,11 +83,11 @@
                              BorderBrush="#2A3050"
                              BorderThickness="1"
                              FontSize="12"
-                             Tag="Ingresa tu usuario"/>
+                             Tag="Nombre de usuario"/>
 
-                    <!-- Email -->
-                    <TextBlock Text="Email" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
-                    <TextBox x:Name="EmailTextBox" 
+                    <!-- Gmail -->
+                    <TextBlock Text="Gmail" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
+                    <TextBox x:Name="GmailTextBox" 
                              Background="#1A1F3A" 
                              Foreground="#FFFFFF"
                              Padding="12"
@@ -96,10 +96,10 @@
                              BorderBrush="#2A3050"
                              BorderThickness="1"
                              FontSize="12"
-                             Tag="ejemplo@email.com"/>
+                             Tag="tu.gmail@gmail.com"/>
 
                     <!-- Server IP -->
-                    <TextBlock Text="IP del Servidor" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
+                    <TextBlock Text="Direccion IP" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
                     <TextBox x:Name="ServerIpTextBox" 
                              Background="#1A1F3A" 
                              Foreground="#FFFFFF"
@@ -109,7 +109,7 @@
                              BorderBrush="#2A3050"
                              BorderThickness="1"
                              FontSize="12"
-                             Tag="ej: localhost:5000"/>
+                             Tag="Direccion ip del servidor"/>
 
                     <!-- Password -->
                     <TextBlock Text="Contraseña" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
@@ -122,23 +122,31 @@
                                  BorderBrush="#2A3050"
                                  BorderThickness="1"
                                  FontSize="12"
-                                 Tag="Ingresa tu contraseña"/>
+                                 Tag="Ingresa una contraseña"/>
 
                     <!-- Password Strength -->
                     <ProgressBar x:Name="PasswordStrengthBar" 
                                  Height="3" 
                                  Background="#1A1F3A"
                                  Foreground="#FF3333"
-                                 Margin="0,0,0,0"/>
+                                 Margin="0,0,0,2"/>
                     <TextBlock x:Name="PasswordStrengthText" 
                                Foreground="#A0A0A0" 
-                               FontSize="9" 
-                               Margin="0,0,0,6"/>
+                               FontSize="12" 
+                               Margin="0,0,0,1"/>
+
+                    <!-- Error Message -->
+                    <TextBlock x:Name="ErrorMessageText" 
+                               Foreground="#FF3333" 
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,3"
+                               Visibility="Collapsed"
+                               FontSize="12"/>
 
                     <!-- Terms -->
                     <CheckBox x:Name="TermsCheckBox" 
                               Foreground="#A0A0A0"
-                              Margin="0,0,0,14"
+                              Margin="0,0,0,6"
                               FontSize="12">
                         <TextBlock TextWrapping="Wrap">
                             <Run Text="Aceptar "/>
@@ -147,14 +155,6 @@
                             </Hyperlink>
                         </TextBlock>
                     </CheckBox>
-
-                    <!-- Error Message -->
-                    <TextBlock x:Name="ErrorMessageText" 
-                               Foreground="#FF3333" 
-                               TextWrapping="Wrap"
-                               Margin="0,0,0,12"
-                               Visibility="Collapsed"
-                               FontSize="10"/>
 
                     <!-- Register Button -->
                     <Button x:Name="RegisterButton" 
@@ -171,10 +171,16 @@
                             BorderThickness="0"
                             Style="{DynamicResource ModernButtonStyle}"/>
 
+                    <!-- Separator -->
+                    <Grid Margin="0,0,0,12" Height="1">
+                        <Rectangle Fill="#2A3050" Opacity="0.5"/>
+                        <TextBlock Text="o" Foreground="#A0A0A0" HorizontalAlignment="Center" Background="#0A0E27" Padding="8,0" FontSize="10"/>
+                    </Grid>
+
                     <!-- Login Link -->
                     <TextBlock TextAlignment="Center" Margin="0,0,0,0">
-                        <Run Text="¿Ya tienes cuenta? " Foreground="#A0A0A0" FontSize="10"/>
-                        <Hyperlink Foreground="#00D9FF" Click="LoginLink_Click" FontSize="10" TextDecorations="None">
+                        <Run Text="¿Ya tienes cuenta? " Foreground="#A0A0A0" FontSize="14"/>
+                        <Hyperlink Foreground="#00D9FF" Click="LoginLink_Click" FontSize="14" TextDecorations="None">
                             <Run Text="Inicia sesión"/>
                         </Hyperlink>
                     </TextBlock>
