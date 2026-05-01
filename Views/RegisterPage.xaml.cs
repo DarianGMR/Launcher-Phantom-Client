@@ -176,7 +176,7 @@ namespace LauncherPhantom.Views
                 bool canConnect = await ServerManager.Instance.TestConnectionAsync();
                 if (!canConnect)
                 {
-                    ShowError("No se puede conectar con el servidor. Verifica la dirección IP.");
+                    ShowError("No se puede conectar con el servidor.");
                     RegisterButton.IsEnabled = true;
                     RegisterButton.Content = "Registrarse";
                     return;

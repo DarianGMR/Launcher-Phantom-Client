@@ -25,7 +25,6 @@
                    Width="200" 
                    Height="200" 
                    Margin="0,0,0,30"
-                   Source="Resources/logo.png"
                    Opacity="0"/>
 
             <!-- Title -->

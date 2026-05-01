@@ -46,7 +46,7 @@ Spinner de carga
 ✅ Panel de Login
 
 Validación de credenciales local
-Campo usuario/email
+Campo usuario/Email
 Campo contraseña
 Campo dirección IP servidor
 Checkbox "Recuérdame" (encriptado DPAPI)
@@ -103,7 +103,7 @@ Response (Success):
   "user": {
     "id": "123",
     "username": "usuario",
-    "email": "user@example.com"
+    "Email": "user@example.com"
   }
 }
 
@@ -117,7 +117,7 @@ JSON
 Request:
 {
   "username": "usuario",
-  "email": "user@email.com",
+  "Email": "user@Email.com",
   "password": "contraseña"
 }
 

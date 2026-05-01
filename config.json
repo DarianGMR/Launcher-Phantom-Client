@@ -7,5 +7,5 @@
   "window_width": 1280,
   "window_height": 720,
   "auto_update": true,
-  "debug_mode": false
+  "debug_mode": true
 }

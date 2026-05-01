@@ -29,6 +29,6 @@ echo.
 echo Ejecutando aplicacion...
 echo.
 
-dotnet run --no-build
+dotnet run Debug --no-build
 
 pause

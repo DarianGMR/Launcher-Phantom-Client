@@ -19,12 +19,12 @@ namespace LauncherPhantom.Managers
             return Regex.IsMatch(username, @"^[a-zA-Z0-9_-]+$");
         }
 
-        public static bool IsValidEmail(string email)
+        public static bool IsValidEmail(string Email)
         {
-            if (string.IsNullOrWhiteSpace(email))
+            if (string.IsNullOrWhiteSpace(Email))
                 return false;
 
-            return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+            return Regex.IsMatch(Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
         }
 
         public static bool IsValidPassword(string password)
