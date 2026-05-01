@@ -8,8 +8,8 @@ namespace LauncherPhantom.Models
         public const string AppAuthor = "DarianGMR";
 
         // Window
-        public const int WindowWidth = 1280;
-        public const int WindowHeight = 720;
+        public const int WindowWidth = 640;
+        public const int WindowHeight = 480;
 
         // Colors (Hex format without #)
         public const string ColorBackground = "0A0E27";

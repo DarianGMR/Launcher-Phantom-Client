@@ -56,52 +56,52 @@
                            FontSize="18" 
                            FontWeight="Bold"
                            Foreground="#00D9FF"
-                           Margin="0,0,0,25"
+                           Margin="0,0,0,20"
                            TextAlignment="Center"/>
 
                 <!-- Username -->
-                <TextBlock Text="Usuario" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
+                <TextBlock Text="Usuario" Foreground="#A0A0A0" FontSize="13" Margin="0,0,0,4" FontWeight="SemiBold"/>
                 <TextBox x:Name="UsernameTextBox" 
                          Background="#1A1F3A" 
                          Foreground="#FFFFFF"
-                         Padding="12"
+                         Padding="10"
                          Height="40"
-                         Margin="0,0,0,12"
+                         Margin="0,0,0,8"
                          BorderBrush="#2A3050"
                          BorderThickness="1"
-                         FontSize="12"
+                         FontSize="14"
                          Tag="Ingresa tu usuario"
                          TextChanged="UsernameTextBox_TextChanged"
                          GotFocus="UsernameTextBox_GotFocus"
                          LostFocus="UsernameTextBox_LostFocus"/>
 
                 <!-- Password -->
-                <TextBlock Text="Contraseña" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
+                <TextBlock Text="Contraseña" Foreground="#A0A0A0" FontSize="13" Margin="0,0,0,4" FontWeight="SemiBold"/>
                 <PasswordBox x:Name="PasswordBox" 
                              Background="#1A1F3A" 
                              Foreground="#FFFFFF"
-                             Padding="12"
+                             Padding="10"
                              Height="40"
-                             Margin="0,0,0,12"
+                             Margin="0,0,0,8"
                              BorderBrush="#2A3050"
                              BorderThickness="1"
-                             FontSize="12"
+                             FontSize="14"
                              Tag="Ingresa tu contraseña"
                              PasswordChanged="PasswordBox_PasswordChanged"
                              GotFocus="PasswordBox_GotFocus"
                              LostFocus="PasswordBox_LostFocus"/>
 
                 <!-- Server IP -->
-                <TextBlock Text="Dirección IP" Foreground="#A0A0A0" FontSize="11" Margin="0,0,0,6" FontWeight="SemiBold"/>
+                <TextBlock Text="Dirección IP" Foreground="#A0A0A0" FontSize="13" Margin="0,0,0,4" FontWeight="SemiBold"/>
                 <TextBox x:Name="ServerIpTextBox" 
                          Background="#1A1F3A" 
                          Foreground="#FFFFFF"
-                         Padding="12"
+                         Padding="10"
                          Height="40"
                          Margin="0,0,0,8"
                          BorderBrush="#2A3050"
                          BorderThickness="1"
-                         FontSize="12"
+                         FontSize="14"
                          Tag="Dirección IP del servidor"
                          TextChanged="ServerIpTextBox_TextChanged"
                          GotFocus="ServerIpTextBox_GotFocus"
