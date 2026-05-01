@@ -1,6 +1,6 @@
 # 🚀 Launcher Phantom v0.1
 
-Launcher de juegos cliente desarrollado en C# .NET con interfaz WPF moderna y futurista.
+Launcher de juegos cliente desarrollado en C# .NET con interfaz WPF moderna.
 
 ## 📋 Requisitos
 
@@ -27,13 +27,7 @@ dotnet run
 
 ```bash
 dotnet build -c Release
-
-Native AOT
-
-dotnet publish -c Release -p:PublishAot=true -r win-x64
 ```
-Esto genera un ejecutable standalone optimizado en:
-bin/Release/net8.0-windows/win-x64/publish/LauncherPhantom.exe
 
 ## 🎨 Características - Phase 1 (Auth)
 ✅ Splash Screen
@@ -46,7 +40,7 @@ Spinner de carga
 ✅ Panel de Login
 
 Validación de credenciales local
-Campo usuario/Email
+Campo usuario
 Campo contraseña
 Campo dirección IP servidor
 Checkbox "Recuérdame" (encriptado DPAPI)
@@ -153,40 +147,6 @@ C#
 var encrypted = EncryptionManager.Instance.Encrypt(plainText);
 var decrypted = EncryptionManager.Instance.Decrypt(encryptedText);
 
-## 📁 Estructura de Carpetas
-```bash
-LauncherPhantom/
-├── Views/
-│   ├── SplashScreen.xaml
-│   ├── LoginPage.xaml
-│   ├── RegisterPage.xaml
-│   ├── UpdateDialog.xaml
-│   └── DownloadProgressWindow.xaml
-├── Managers/
-│   ├── AuthManager.cs
-│   ├── ServerManager.cs
-│   ├── UpdateManager.cs
-│   ├── EncryptionManager.cs
-│   ├── SoundManager.cs
-│   ├── ConfigManager.cs
-│   ├── ValidationManager.cs
-│   └── DatabaseManager.cs
-├── Models/
-│   ├── Constants.cs
-│   ├── AuthResponse.cs
-│   ├── LoginRequest.cs
-│   ├── RegisterRequest.cs
-│   └── VersionInfo.cs
-├── Resources/
-│   ├── logo.png
-│   ├── splash.png
-│   ├── click.wav
-│   ├── success.wav
-│   ├── error.wav
-│   └── config.json
-└── App.xaml
-```
-
 ## 🔊 Recursos de Audio
 Requiere tres archivos .wav en Resources/:
 
@@ -219,21 +179,12 @@ Privado - DarianGMR
 
 ## 👤 Autor
 DarianGMR
-Versión: 0.1.0 Última actualización: 2026-04-29
+Versión: 0.1.0 Última actualización: 2026-05-1
 
 ---
 
-## 📥 DESCARGA
-
-Aquí están **TODOS los archivos listos** para que los copies directamente a tu proyecto Visual Studio.
-
-**Pasos para usar los archivos:**
-
-1. **Crea un nuevo proyecto WPF** en Visual Studio 2019+ (`.NET 8.0`)
-2. **Copia todos los archivos** en su estructura de carpetas correspondiente
-3. **Instala los NuGet packages**:
-Install-Package Newtonsoft.Json Install-Package System.Data.SQLite Install-Package BCrypt.Net-Next Install-Package TagLibSharp
-
-4. **Agrega los recursos** (imágenes y sonidos) en la carpeta `Resources/`
-5. **Compila** con `dotnet build`
-6. **Ejecuta** con `dotnet run`
+**Instala los NuGet packages**:
+Install-Package Newtonsoft.Json
+Install-Package System.Data.SQLite
+Install-Package BCrypt.Net-Next
+Install-Package TagLibSharp
