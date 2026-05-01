@@ -36,7 +36,13 @@ namespace LauncherPhantom.Managers
 
         private AuthManager()
         {
-            _httpClient = new HttpClient();
+            var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true; // Solo para desarrollo
+            
+            _httpClient = new HttpClient(handler)
+            {
+                Timeout = TimeSpan.FromSeconds(10)
+            };
             Debug.WriteLine("[AuthManager] Inicializado");
         }
 
@@ -45,6 +51,13 @@ namespace LauncherPhantom.Managers
             try
             {
                 var serverUrl = ConfigManager.Instance.GetSetting("server_url") ?? "http://localhost:5000";
+                
+                // Normalizar URL
+                if (!serverUrl.StartsWith("http://") && !serverUrl.StartsWith("https://"))
+                {
+                    serverUrl = "http://" + serverUrl;
+                }
+
                 var endpoint = $"{serverUrl}/api/auth/login";
 
                 Debug.WriteLine($"[AuthManager] Enviando login a: {endpoint}");
@@ -56,6 +69,7 @@ namespace LauncherPhantom.Managers
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 Debug.WriteLine($"[AuthManager] Respuesta status: {response.StatusCode}");
+                Debug.WriteLine($"[AuthManager] Respuesta contenido: {responseContent}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -76,9 +90,16 @@ namespace LauncherPhantom.Managers
                 return JsonConvert.DeserializeObject<AuthResponse>(responseContent) 
                     ?? new AuthResponse { Success = false, Error = "Error desconocido" };
             }
+            catch (HttpRequestException ex)
+            {
+                Debug.WriteLine($"[AuthManager] Error HTTP en LoginAsync: {ex.Message}");
+                Debug.WriteLine($"[AuthManager] Inner Exception: {ex.InnerException?.Message}");
+                return new AuthResponse { Success = false, Error = $"Error de conexión HTTP: {ex.Message}" };
+            }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[AuthManager] Error en LoginAsync: {ex.Message}");
+                Debug.WriteLine($"[AuthManager] Stack Trace: {ex.StackTrace}");
                 return new AuthResponse { Success = false, Error = $"Error de conexión: {ex.Message}" };
             }
         }
@@ -88,6 +109,13 @@ namespace LauncherPhantom.Managers
             try
             {
                 var serverUrl = ConfigManager.Instance.GetSetting("server_url") ?? "http://localhost:5000";
+                
+                // Normalizar URL
+                if (!serverUrl.StartsWith("http://") && !serverUrl.StartsWith("https://"))
+                {
+                    serverUrl = "http://" + serverUrl;
+                }
+
                 var endpoint = $"{serverUrl}/api/auth/register";
 
                 Debug.WriteLine($"[AuthManager] Enviando registro a: {endpoint}");
@@ -99,9 +127,15 @@ namespace LauncherPhantom.Managers
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 Debug.WriteLine($"[AuthManager] Respuesta status: {response.StatusCode}");
+                Debug.WriteLine($"[AuthManager] Respuesta contenido: {responseContent}");
 
                 return JsonConvert.DeserializeObject<AuthResponse>(responseContent) 
                     ?? new AuthResponse { Success = false, Error = "Error desconocido" };
+            }
+            catch (HttpRequestException ex)
+            {
+                Debug.WriteLine($"[AuthManager] Error HTTP en RegisterAsync: {ex.Message}");
+                return new AuthResponse { Success = false, Error = $"Error de conexión HTTP: {ex.Message}" };
             }
             catch (Exception ex)
             {

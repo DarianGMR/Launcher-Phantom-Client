@@ -36,12 +36,25 @@ namespace LauncherPhantom.Managers
 
         private ServerManager()
         {
-            _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+            // Agregar timeout suficiente y configuración de handler
+            var handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true; // Solo para desarrollo
+            
+            _httpClient = new HttpClient(handler) 
+            { 
+                Timeout = TimeSpan.FromSeconds(10)
+            };
             Debug.WriteLine("[ServerManager] Inicializado");
         }
 
         public void SetServerUrl(string url)
         {
+            // Normalizar URL: agregar http:// si falta y remover puerto por defecto si está
+            if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+            {
+                url = "http://" + url;
+            }
+
             _serverUrl = url;
             ConfigManager.Instance.SetSetting("server_url", url);
             Debug.WriteLine($"[ServerManager] URL actualizada: {url}");
@@ -52,17 +65,41 @@ namespace LauncherPhantom.Managers
             try
             {
                 _serverUrl = ConfigManager.Instance.GetSetting("server_url") ?? "http://localhost:5000";
+                
+                // Normalizar URL
+                if (!_serverUrl.StartsWith("http://") && !_serverUrl.StartsWith("https://"))
+                {
+                    _serverUrl = "http://" + _serverUrl;
+                }
+
                 Debug.WriteLine($"[ServerManager] Probando conexión a: {_serverUrl}");
                 
-                var response = await _httpClient.GetAsync($"{_serverUrl}/health");
+                // Intentar acceder al endpoint /api/launcher/health
+                var healthUrl = $"{_serverUrl}/api/launcher/health";
+                Debug.WriteLine($"[ServerManager] URL de salud: {healthUrl}");
+                
+                var response = await _httpClient.GetAsync(healthUrl);
                 bool isSuccess = response.IsSuccessStatusCode;
                 
+                Debug.WriteLine($"[ServerManager] Status Code: {response.StatusCode}");
                 Debug.WriteLine($"[ServerManager] Conexión resultado: {(isSuccess ? "OK" : "FALLO")}");
                 return isSuccess;
             }
+            catch (HttpRequestException ex)
+            {
+                Debug.WriteLine($"[ServerManager] Error HTTP en TestConnectionAsync: {ex.Message}");
+                Debug.WriteLine($"[ServerManager] Inner Exception: {ex.InnerException?.Message}");
+                return false;
+            }
+            catch (TaskCanceledException ex)
+            {
+                Debug.WriteLine($"[ServerManager] Timeout en TestConnectionAsync: {ex.Message}");
+                return false;
+            }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ServerManager] Error en TestConnectionAsync: {ex.Message}");
+                Debug.WriteLine($"[ServerManager] Error general en TestConnectionAsync: {ex.Message}");
+                Debug.WriteLine($"[ServerManager] Tipo de excepción: {ex.GetType().Name}");
                 return false;
             }
         }
