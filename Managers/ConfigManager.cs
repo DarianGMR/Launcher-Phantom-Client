@@ -44,7 +44,6 @@ namespace LauncherPhantom.Managers
                 if (!Directory.Exists(_appDataPath))
                 {
                     Directory.CreateDirectory(_appDataPath);
-                    Debug.WriteLine($"[ConfigManager] Carpeta creada: {_appDataPath}");
                 }
 
                 _configPath = Path.Combine(_appDataPath, "config.json");
@@ -93,7 +92,6 @@ namespace LauncherPhantom.Managers
             {
                 if (_config.TryGetValue(key, out var value))
                 {
-                    Debug.WriteLine($"[ConfigManager] Get: {key} = {value}");
                     return value;
                 }
                 return null;
@@ -111,7 +109,7 @@ namespace LauncherPhantom.Managers
             {
                 _config[key] = value;
                 SaveConfig();
-                Debug.WriteLine($"[ConfigManager] Set: {key} = {value}");
+                Debug.WriteLine($"[ConfigManager] Set: {key}");
             }
             catch (Exception ex)
             {

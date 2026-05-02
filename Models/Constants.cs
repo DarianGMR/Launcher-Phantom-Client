@@ -30,5 +30,7 @@ namespace LauncherPhantom.Models
         // Timing
         public const int SplashScreenDuration = 5000;
         public const int LoginTimeout = 30000;
+        public const int UpdateCheckTimeout = 15000;
+        public const int ConnectionCheckInterval = 30;
     }
 }

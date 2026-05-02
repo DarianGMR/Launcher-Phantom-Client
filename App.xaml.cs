@@ -12,10 +12,8 @@ namespace LauncherPhantom
             try
             {
                 // Initialize managers
-                Debug.WriteLine("[APP] Inicializando ConfigManager...");
                 ConfigManager.Instance.LoadConfig();
                 
-                Debug.WriteLine("[APP] Inicializando DatabaseManager...");
                 DatabaseManager.Instance.Initialize();
                 
                 Debug.WriteLine("[APP] Managers inicializados correctamente");
@@ -24,7 +22,7 @@ namespace LauncherPhantom
                 MainWindow = new MainWindow();
                 MainWindow.Show();
                 
-                Debug.WriteLine("[APP] Aplicación iniciada correctamente");
+                Debug.WriteLine("[APP] Launcher iniciado correctamente");
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace LauncherPhantom
         {
             try
             {
-                Debug.WriteLine("[APP] Cerrando aplicación...");
+                Debug.WriteLine("[APP] Cerrando Launcher...");
                 DatabaseManager.Instance.Dispose();
             }
             catch (Exception ex)

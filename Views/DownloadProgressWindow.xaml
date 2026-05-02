@@ -2,43 +2,86 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Descargando Actualización"
-        Width="500"
-        Height="200"
+        Width="550"
+        Height="280"
         WindowStartupLocation="CenterOwner"
         Background="#0A0E27"
         Foreground="#FFFFFF"
         WindowStyle="ToolWindow"
         ResizeMode="NoResize"
-        Closing="Window_Closing">
+        Closing="Window_Closing"
+        Icon="pack://application:,,,/Resources/Images/icon.ico">
     
-    <Grid Margin="20">
-        <StackPanel VerticalAlignment="Center">
+    <Grid Margin="30">
+        <StackPanel VerticalAlignment="Stretch">
             <!-- Title -->
             <TextBlock Text="Descargando Actualización" 
-                       FontSize="18" 
+                       FontSize="20" 
                        FontWeight="Bold"
                        Foreground="#00D9FF"
-                       Margin="0,0,0,20"/>
+                       Margin="0,0,0,25"/>
 
             <!-- Progress Bar -->
             <ProgressBar x:Name="ProgressBar" 
-                         Height="20" 
+                         Height="25" 
                          Foreground="#00D9FF"
                          Background="#1A1F3A"
-                         Margin="0,0,0,15"/>
+                         Margin="0,0,0,20"
+                         Value="0"/>
 
-            <!-- Progress Text -->
-            <TextBlock x:Name="ProgressText" 
-                       Foreground="#A0A0A0" 
-                       FontSize="12"
+            <!-- Percentage Text -->
+            <TextBlock x:Name="PercentageText" 
+                       Text="0%" 
+                       Foreground="#39FF14" 
+                       FontSize="16"
+                       FontWeight="Bold"
                        TextAlignment="Center"
                        Margin="0,0,0,15"/>
 
-            <!-- Status -->
+            <!-- Progress Info -->
+            <StackPanel Margin="0,0,0,20">
+                <TextBlock Text="Información de Descarga" 
+                          Foreground="#FFFFFF" 
+                          FontSize="12"
+                          FontWeight="Bold"
+                          Margin="0,0,0,8"/>
+                
+                <TextBlock x:Name="BytesText" 
+                          Text="0 MB / 0 MB" 
+                          Foreground="#A0A0A0" 
+                          FontSize="12"
+                          Margin="0,0,0,5"/>
+                
+                <TextBlock x:Name="SpeedText" 
+                          Text="Velocidad: 0 MB/s" 
+                          Foreground="#A0A0A0" 
+                          FontSize="12"
+                          Margin="0,0,0,5"/>
+                
+                <TextBlock x:Name="TimeRemainingText" 
+                          Text="Tiempo restante: Calculando..." 
+                          Foreground="#A0A0A0" 
+                          FontSize="12"/>
+            </StackPanel>
+
+            <!-- Status Text -->
             <TextBlock x:Name="StatusText" 
+                       Text="Iniciando descarga..." 
                        Foreground="#00D9FF" 
                        FontSize="12"
-                       TextAlignment="Center"/>
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Margin="0,0,0,15"/>
+
+            <!-- Cancel Button -->
+            <Button x:Name="CancelDownloadButton" 
+                    Content="Cancelar" 
+                    Background="#FF3333"
+                    Foreground="#FFFFFF"
+                    Padding="15,10"
+                    Cursor="Hand"
+                    Click="CancelDownloadButton_Click"
+                    HorizontalAlignment="Right"/>
         </StackPanel>
     </Grid>
 </Window>

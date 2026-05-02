@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using LauncherPhantom.Models;
 using System.IO;
 
@@ -15,6 +16,7 @@ namespace LauncherPhantom.Managers
         
         private HttpClient _httpClient;
         private string _serverUrl = "http://localhost:5000";
+        private System.Timers.Timer? _connectionCheckTimer;
 
         public static ServerManager Instance
         {
@@ -36,9 +38,8 @@ namespace LauncherPhantom.Managers
 
         private ServerManager()
         {
-            // Agregar timeout suficiente y configuración de handler
             var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true; // Solo para desarrollo
+            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
             
             _httpClient = new HttpClient(handler) 
             { 
@@ -49,7 +50,6 @@ namespace LauncherPhantom.Managers
 
         public void SetServerUrl(string url)
         {
-            // Normalizar URL: agregar http:// si falta y remover puerto por defecto si está
             if (!url.StartsWith("http://") && !url.StartsWith("https://"))
             {
                 url = "http://" + url;
@@ -66,40 +66,30 @@ namespace LauncherPhantom.Managers
             {
                 _serverUrl = ConfigManager.Instance.GetSetting("server_url") ?? "http://localhost:5000";
                 
-                // Normalizar URL
                 if (!_serverUrl.StartsWith("http://") && !_serverUrl.StartsWith("https://"))
                 {
                     _serverUrl = "http://" + _serverUrl;
                 }
-
-                Debug.WriteLine($"[ServerManager] Probando conexión a: {_serverUrl}");
                 
-                // Intentar acceder al endpoint /api/launcher/health
-                var healthUrl = $"{_serverUrl}/api/launcher/health";
-                Debug.WriteLine($"[ServerManager] URL de salud: {healthUrl}");
-                
+                var healthUrl = $"{_serverUrl}/api/launcher/health";                
                 var response = await _httpClient.GetAsync(healthUrl);
                 bool isSuccess = response.IsSuccessStatusCode;
                 
-                Debug.WriteLine($"[ServerManager] Status Code: {response.StatusCode}");
-                Debug.WriteLine($"[ServerManager] Conexión resultado: {(isSuccess ? "OK" : "FALLO")}");
                 return isSuccess;
             }
             catch (HttpRequestException ex)
             {
-                Debug.WriteLine($"[ServerManager] Error HTTP en TestConnectionAsync: {ex.Message}");
-                Debug.WriteLine($"[ServerManager] Inner Exception: {ex.InnerException?.Message}");
+                Debug.WriteLine($"[ServerManager] Error HTTP: {ex.Message}");
                 return false;
             }
             catch (TaskCanceledException ex)
             {
-                Debug.WriteLine($"[ServerManager] Timeout en TestConnectionAsync: {ex.Message}");
+                Debug.WriteLine($"[ServerManager] Timeout: {ex.Message}");
                 return false;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ServerManager] Error general en TestConnectionAsync: {ex.Message}");
-                Debug.WriteLine($"[ServerManager] Tipo de excepción: {ex.GetType().Name}");
+                Debug.WriteLine($"[ServerManager] Error general: {ex.Message}");
                 return false;
             }
         }
@@ -112,68 +102,146 @@ namespace LauncherPhantom.Managers
                 
                 var response = await _httpClient.GetAsync($"{_serverUrl}/api/launcher/version");
                 var content = await response.Content.ReadAsStringAsync();
-                
+                                
                 if (response.IsSuccessStatusCode)
                 {
-                    var versionInfo = JsonConvert.DeserializeObject<VersionInfo>(content);
-                    Debug.WriteLine($"[ServerManager] Versión obtenida: {versionInfo?.Version}");
-                    return versionInfo;
+                    try
+                    {
+                        // Usar JObject para parsear primero y convertir
+                        var jObject = JObject.Parse(content);
+                        
+                        var versionInfo = new VersionInfo
+                        {
+                            Version = jObject["version"]?.ToString() ?? "",
+                            DownloadUrl = jObject["downloadUrl"]?.ToString() ?? "",
+                            Required = jObject["required"]?.Value<bool>() ?? false,
+                            ReleaseDate = jObject["releaseDate"]?.ToString(),
+                            Status = jObject["status"]?.ToString(),
+                            Changes = ""
+                        };
+
+                        // Convertir el array de cambios a string
+                        var changesToken = jObject["changes"];
+                        if (changesToken != null)
+                        {
+                            if (changesToken.Type == JTokenType.Array)
+                            {
+                                // Si es un array, convertir a string con saltos de línea
+                                var changesList = changesToken.ToObject<string[]>();
+                                versionInfo.Changes = string.Join("\n", changesList);
+                            }
+                            else if (changesToken.Type == JTokenType.String)
+                            {
+                                // Si ya es un string, usar tal cual
+                                versionInfo.Changes = changesToken.ToString();
+                            }
+                        }
+
+                        Debug.WriteLine($"[ServerManager] Versión obtenida: {versionInfo.Version}");
+                        Debug.WriteLine($"[ServerManager] Cambios: {versionInfo.Changes}");
+                        return versionInfo;
+                    }
+                    catch (JsonException ex)
+                    {
+                        Debug.WriteLine($"[ServerManager] Error parseando JSON: {ex.Message}");
+                        Debug.WriteLine($"[ServerManager] Contenido problemático: {content}");
+                        return null;
+                    }
                 }
                 
-                Debug.WriteLine("[ServerManager] Error obteniendo versión");
+                Debug.WriteLine($"[ServerManager] Error obteniendo versión: {response.StatusCode}");
                 return null;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[ServerManager] Error en GetVersionAsync: {ex.Message}");
+                Debug.WriteLine($"[ServerManager] StackTrace: {ex.StackTrace}");
                 return null;
             }
         }
 
-        public async Task<string> DownloadFileAsync(string fileUrl, IProgress<long> progress)
+        public async Task<string> DownloadFileAsync(string fileUrl, IProgress<long>? progress = null)
         {
             try
             {
-                var downloadPath = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    "Phantom", "launcher-update.exe");
-
-                Debug.WriteLine($"[ServerManager] Descargando desde: {fileUrl}");
+                var fileName = Path.GetFileName(new Uri(fileUrl).AbsolutePath);
+                var downloadPath = Path.Combine(UpdateManager.GetUpdateFolder(), fileName);
 
                 using (var response = await _httpClient.GetAsync(fileUrl, HttpCompletionOption.ResponseHeadersRead))
                 {
                     response.EnsureSuccessStatusCode();
-
-                    var totalBytes = response.Content.Headers.ContentLength ?? 0L;
-                    var canReportProgress = totalBytes != 0;
-
+                    
+                    var totalSize = response.Content.Headers.ContentLength ?? -1L;
                     using (var contentStream = await response.Content.ReadAsStreamAsync())
-                    using (var fileStream = File.Create(downloadPath))
+                    using (var fileStream = new FileStream(downloadPath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
                     {
-                        var totalRead = 0L;
                         var buffer = new byte[8192];
                         int read;
+                        long totalRead = 0;
 
                         while ((read = await contentStream.ReadAsync(buffer, 0, buffer.Length)) != 0)
                         {
                             await fileStream.WriteAsync(buffer, 0, read);
                             totalRead += read;
-
-                            if (canReportProgress)
-                            {
-                                progress.Report(totalRead);
-                            }
+                            progress?.Report(totalRead);
                         }
                     }
+                }
 
-                    Debug.WriteLine($"[ServerManager] Descarga completada: {downloadPath}");
-                    return downloadPath;
+                return downloadPath;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[ServerManager] Error descargando archivo: {ex.Message}");
+                throw;
+            }
+        }
+
+        public void StartConnectionMonitoring(Func<Task<bool>> connectionCheck, int intervalSeconds = 30)
+        {
+            try
+            {
+                if (_connectionCheckTimer != null)
+                {
+                    _connectionCheckTimer.Stop();
+                    _connectionCheckTimer.Dispose();
+                }
+
+                _connectionCheckTimer = new System.Timers.Timer(intervalSeconds * 1000);
+                _connectionCheckTimer.Elapsed += async (s, e) =>
+                {
+                    try
+                    {
+                        var isConnected = await connectionCheck();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[ServerManager] Error verificando conexión: {ex.Message}");
+                    }
+                };
+                _connectionCheckTimer.AutoReset = true;
+                _connectionCheckTimer.Start();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[ServerManager] Error iniciando monitoreo: {ex.Message}");
+            }
+        }
+
+        public void StopConnectionMonitoring()
+        {
+            try
+            {
+                if (_connectionCheckTimer != null)
+                {
+                    _connectionCheckTimer.Stop();
+                    _connectionCheckTimer.Dispose();
+                    _connectionCheckTimer = null;
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ServerManager] Error en DownloadFileAsync: {ex.Message}");
-                throw new Exception($"Error descargando archivo: {ex.Message}");
+                Debug.WriteLine($"[ServerManager] Error deteniendo monitoreo: {ex.Message}");
             }
         }
     }

@@ -126,9 +126,6 @@ namespace LauncherPhantom.Managers
                 var response = await _httpClient.PostAsync(endpoint, content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
-                Debug.WriteLine($"[AuthManager] Respuesta status: {response.StatusCode}");
-                Debug.WriteLine($"[AuthManager] Respuesta contenido: {responseContent}");
-
                 return JsonConvert.DeserializeObject<AuthResponse>(responseContent) 
                     ?? new AuthResponse { Success = false, Error = "Error desconocido" };
             }

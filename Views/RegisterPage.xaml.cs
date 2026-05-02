@@ -244,7 +244,6 @@ namespace LauncherPhantom.Views
 
         private void LoginLink_Click(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine("[RegisterPage] Navegando a LoginPage");
             try
             {
                 var mainWindow = Application.Current.MainWindow as MainWindow;

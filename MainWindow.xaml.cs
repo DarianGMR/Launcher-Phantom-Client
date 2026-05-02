@@ -5,6 +5,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using LauncherPhantom.Views;
 
 namespace LauncherPhantom
@@ -12,6 +13,10 @@ namespace LauncherPhantom
     public partial class MainWindow : Window
     {
         private RotateTransform? _spinnerRotate;
+        private const int LoginWidth = 640;
+        private const int LoginHeight = 480;
+        private const int DashboardWidth = 840;
+        private const int DashboardHeight = 580;
 
         public MainWindow()
         {
@@ -28,6 +33,28 @@ namespace LauncherPhantom
             {
                 Debug.WriteLine($"[MainWindow] Error en constructor: {ex.Message}");
                 MessageBox.Show($"Error inicializando ventana: {ex.Message}");
+            }
+        }
+
+        private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            // Bloquear teclas que interfieren con la navegación
+            if (e.Key == Key.Back || e.Key == Key.Delete)
+            {
+                // Permitir solo si el foco está en un TextBox o PasswordBox
+                var focusedElement = Keyboard.FocusedElement;
+                
+                if (focusedElement is TextBox textBox)
+                {
+                    return;
+                }
+                
+                if (focusedElement is PasswordBox passwordBox)
+                {
+                    return;
+                }
+
+                e.Handled = true;
             }
         }
 
@@ -131,7 +158,6 @@ namespace LauncherPhantom
 
         private void AnimateLoading()
         {
-            // Rotate the spinner
             _spinnerRotate = new RotateTransform();
             LoadingSpinner.RenderTransform = _spinnerRotate;
             LoadingSpinner.RenderTransformOrigin = new Point(0.5, 0.5);
@@ -147,6 +173,17 @@ namespace LauncherPhantom
         {
             try
             {
+                
+                // Cambiar tamaño de la ventana según la página
+                if (page is DashboardPage)
+                {
+                    ResizeWindow(DashboardWidth, DashboardHeight);
+                }
+                else
+                {
+                    ResizeWindow(LoginWidth, LoginHeight);
+                }
+                
                 MainFrame.Navigate(page);
                 Debug.WriteLine($"[MainWindow] Navegación exitosa a {page.GetType().Name}");
             }
@@ -154,6 +191,32 @@ namespace LauncherPhantom
             {
                 Debug.WriteLine($"[MainWindow] Error al navegar: {ex.Message}");
                 MessageBox.Show($"Error en navegación: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ResizeWindow(int width, int height)
+        {
+            try
+            {                
+                // Obtener la posición actual del centro de la pantalla
+                var screenWidth = SystemParameters.PrimaryScreenWidth;
+                var screenHeight = SystemParameters.PrimaryScreenHeight;
+                            
+                // Calcular la nueva posición para centrar la ventana
+                var newLeft = (screenWidth - width) / 2;
+                var newTop = (screenHeight - height) / 2;
+                                
+                // Cambiar tamaño inmediatamente
+                this.Width = width;
+                this.Height = height;
+                
+                // Centrar la ventana inmediatamente
+                this.Left = newLeft;
+                this.Top = newTop;
+                            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[MainWindow] Error redimensionando ventana: {ex.Message}");
             }
         }
 

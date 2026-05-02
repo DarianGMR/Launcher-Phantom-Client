@@ -20,7 +20,15 @@ namespace LauncherPhantom.Views
         {
             try
             {
-                Debug.WriteLine("[LoginPage] Página cargada");
+                
+                // Verificar si hay error de conexión desde el dashboard
+                var connectionError = ConfigManager.Instance.GetSetting("connection_error");
+                if (!string.IsNullOrEmpty(connectionError))
+                {
+                    Debug.WriteLine($"[LoginPage] Conexion perdida: {connectionError}");
+                    ShowError(connectionError);
+                    ConfigManager.Instance.DeleteSetting("connection_error");
+                }
                 
                 var savedUsername = ConfigManager.Instance.GetSetting("saved_username");
                 var savedPassword = ConfigManager.Instance.GetSetting("saved_password");
@@ -46,7 +54,6 @@ namespace LauncherPhantom.Views
                 }
                 else
                 {
-                    // Show placeholders when empty
                     UpdatePlaceholders();
                 }
             }
@@ -56,9 +63,9 @@ namespace LauncherPhantom.Views
             }
         }
 
-        // Username TextBox Events
         private void UsernameTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            ErrorMessageText.Visibility = Visibility.Collapsed;
             UpdatePlaceholders();
         }
 
@@ -72,9 +79,9 @@ namespace LauncherPhantom.Views
             UpdatePlaceholders();
         }
 
-        // Password TextBox Events
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
+            ErrorMessageText.Visibility = Visibility.Collapsed;
             UpdatePlaceholders();
         }
 
@@ -88,9 +95,9 @@ namespace LauncherPhantom.Views
             UpdatePlaceholders();
         }
 
-        // Server IP TextBox Events
         private void ServerIpTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            ErrorMessageText.Visibility = Visibility.Collapsed;
             UpdatePlaceholders();
         }
 
@@ -106,19 +113,16 @@ namespace LauncherPhantom.Views
 
         private void UpdatePlaceholders()
         {
-            // Update Username placeholder
             if (UsernameTextBox.Template.FindName("PlaceholderText", UsernameTextBox) is TextBlock usernamePlaceholder)
             {
                 usernamePlaceholder.Visibility = string.IsNullOrEmpty(UsernameTextBox.Text) ? Visibility.Visible : Visibility.Collapsed;
             }
 
-            // Update Password placeholder
             if (PasswordBox.Template.FindName("PlaceholderText", PasswordBox) is TextBlock passwordPlaceholder)
             {
                 passwordPlaceholder.Visibility = string.IsNullOrEmpty(PasswordBox.Password) ? Visibility.Visible : Visibility.Collapsed;
             }
 
-            // Update Server IP placeholder
             if (ServerIpTextBox.Template.FindName("PlaceholderText", ServerIpTextBox) is TextBlock serverIpPlaceholder)
             {
                 serverIpPlaceholder.Visibility = string.IsNullOrEmpty(ServerIpTextBox.Text) ? Visibility.Visible : Visibility.Collapsed;
@@ -127,123 +131,127 @@ namespace LauncherPhantom.Views
 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine("[LoginPage] LoginButton_Click");
-            ErrorMessageText.Visibility = Visibility.Collapsed;
-            
-            var validationResult = ValidateInputs();
-            if (!validationResult.IsValid)
-            {
-                Debug.WriteLine($"[LoginPage] Validación falló: {validationResult.Message}");
-                ShowError(validationResult.Message);
-                return;
-            }
-
-            LoginButton.IsEnabled = false;
-            LoginButton.Content = "Iniciando sesión...";
-
             try
             {
-                Debug.WriteLine("[LoginPage] Probando conexión con servidor...");
-                ServerManager.Instance.SetServerUrl($"http://{ServerIpTextBox.Text}");
+                Debug.WriteLine("[LoginPage] LoginButton_Click");
+                ErrorMessageText.Visibility = Visibility.Collapsed;
                 
-                bool canConnect = await ServerManager.Instance.TestConnectionAsync();
-                if (!canConnect)
+                var validationResult = ValidateInputs();
+                if (!validationResult.IsValid)
                 {
-                    ShowError("No se puede conectar con el servidor.");
+                    ShowError(validationResult.Message);
+                    return;
+                }
+
+                LoginButton.IsEnabled = false;
+                LoginButton.Content = "Conectando...";
+
+                ServerManager.Instance.SetServerUrl(ServerIpTextBox.Text);
+
+                var isConnected = await ServerManager.Instance.TestConnectionAsync();
+                if (!isConnected)
+                {
+                    ShowError("No se puede conectar con el servidor.\nVerifica la dirección IP.");
                     LoginButton.IsEnabled = true;
                     LoginButton.Content = "Iniciar Sesión";
                     return;
                 }
 
-                Debug.WriteLine("[LoginPage] Enviando request de login...");
-                
-                var request = new LoginRequest
+                var loginRequest = new LoginRequest
                 {
                     Username = UsernameTextBox.Text,
                     Password = PasswordBox.Password
                 };
 
-                var response = await AuthManager.Instance.LoginAsync(request);
+                var response = await AuthManager.Instance.LoginAsync(loginRequest);
 
-                if (response.Success)
+                if (!response.Success)
                 {
-                    Debug.WriteLine("[LoginPage] Login exitoso");
-                    
-                    if (RememberMeCheckBox.IsChecked.GetValueOrDefault())
-                    {
-                        ConfigManager.Instance.SetSetting("saved_username", 
-                            EncryptionManager.Instance.Encrypt(UsernameTextBox.Text));
-                        ConfigManager.Instance.SetSetting("saved_password", 
-                            EncryptionManager.Instance.Encrypt(PasswordBox.Password));
-                        ConfigManager.Instance.SetSetting("server_url",
-                            $"http://{ServerIpTextBox.Text}");
-                        
-                        Debug.WriteLine("[LoginPage] Credenciales guardadas");
-                    }
-                    else
-                    {
-                        ConfigManager.Instance.DeleteSetting("saved_username");
-                        ConfigManager.Instance.DeleteSetting("saved_password");
-                    }
+                    ShowError(response.Error ?? "Error desconocido en el login");
+                    LoginButton.IsEnabled = true;
+                    LoginButton.Content = "Iniciar Sesión";
+                    return;
+                }
 
-                    SoundManager.Instance.PlaySound("success");
-                    MessageBox.Show("¡Sesión iniciada exitosamente!", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
-                    
-                    Application.Current.Shutdown();
+                if (RememberMeCheckBox.IsChecked == true)
+                {
+                    ConfigManager.Instance.SetSetting("saved_username", 
+                        EncryptionManager.Instance.Encrypt(UsernameTextBox.Text));
+                    ConfigManager.Instance.SetSetting("saved_password", 
+                        EncryptionManager.Instance.Encrypt(PasswordBox.Password));
                 }
                 else
                 {
-                    Debug.WriteLine($"[LoginPage] Login fallo: {response.Error}");
-                    SoundManager.Instance.PlaySound("error");
-                    ShowError(response.Error ?? "Error desconocido");
+                    ConfigManager.Instance.DeleteSetting("saved_username");
+                    ConfigManager.Instance.DeleteSetting("saved_password");
                 }
+
+                ConfigManager.Instance.SetSetting("current_username", UsernameTextBox.Text);
+
+                Debug.WriteLine("[LoginPage] Login exitoso!");
+
+                await ShowUpdateCheckSplashAsync();
+
+                LoginButton.IsEnabled = true;
+                LoginButton.Content = "Iniciar Sesión";
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[LoginPage] ERROR: {ex.Message}");
-                SoundManager.Instance.PlaySound("error");
-                ShowError($"Error de conexión: {ex.Message}");
-            }
-            finally
-            {
+                Debug.WriteLine($"[LoginPage] Error en LoginButton_Click: {ex.Message}");
+                ShowError($"Error: {ex.Message}");
                 LoginButton.IsEnabled = true;
                 LoginButton.Content = "Iniciar Sesión";
             }
         }
 
-        private void RegisterLink_Click(object sender, RoutedEventArgs e)
+        private async Task ShowUpdateCheckSplashAsync()
         {
-            Debug.WriteLine("[LoginPage] Navegando a RegisterPage");
             try
             {
-                var mainWindow = Application.Current.MainWindow as MainWindow;
-                if (mainWindow != null)
+                
+                var mainWindow = Window.GetWindow(this) as MainWindow;
+                if (mainWindow == null)
                 {
-                    mainWindow.NavigateTo(new RegisterPage());
+                    throw new Exception("MainWindow no encontrada");
                 }
+
+                var updateSplash = new UpdateCheckSplash();
+                updateSplash.Owner = mainWindow;
+                var result = updateSplash.ShowDialog();
+
+                if (updateSplash.IsCancelled)
+                {
+                    ShowError("Es necesario actualizar para continuar.");
+                    await Task.Delay(2000);
+                    return;
+                }
+
+                if (updateSplash.IsUpdateApplied)
+                {
+                    Debug.WriteLine("[LoginPage] Actualización aplicada, cerrando aplicación");
+                    Application.Current.Shutdown();
+                    return;
+                }
+
+                mainWindow.NavigateTo(new DashboardPage());
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[LoginPage] Error al navegar: {ex.Message}");
+                Debug.WriteLine($"[LoginPage] Error en ShowUpdateCheckSplashAsync: {ex.Message}");
+                ShowError($"Error verificando actualizaciones: {ex.Message}");
             }
         }
 
         private (bool IsValid, string Message) ValidateInputs()
         {
             if (string.IsNullOrWhiteSpace(UsernameTextBox.Text))
-                return (false, "El usuario no puede estar vacío");
-
-            if (UsernameTextBox.Text.Length < 3)
-                return (false, "El usuario debe tener al menos 3 caracteres");
+                return (false, "El nombre de usuario es requerido");
 
             if (string.IsNullOrWhiteSpace(PasswordBox.Password))
-                return (false, "La contraseña no puede estar vacía");
-
-            if (PasswordBox.Password.Length < 6)
-                return (false, "La contraseña debe tener al menos 6 caracteres");
+                return (false, "La contraseña es requerida");
 
             if (string.IsNullOrWhiteSpace(ServerIpTextBox.Text))
-                return (false, "La dirección IP del servidor no puede estar vacía");
+                return (false, "La dirección del servidor es requerida");
 
             return (true, "");
         }
@@ -252,6 +260,14 @@ namespace LauncherPhantom.Views
         {
             ErrorMessageText.Text = message;
             ErrorMessageText.Visibility = Visibility.Visible;
+        }
+
+        private void RegisterLink_Click(object sender, RoutedEventArgs e)
+        {
+            if (Window.GetWindow(this) is MainWindow mainWindow)
+            {
+                mainWindow.NavigateTo(new RegisterPage());
+            }
         }
     }
 }
