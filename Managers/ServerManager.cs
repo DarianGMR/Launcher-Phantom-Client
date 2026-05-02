@@ -17,6 +17,7 @@ namespace LauncherPhantom.Managers
         private HttpClient _httpClient;
         private string _serverUrl = "http://localhost:5000";
         private System.Timers.Timer? _connectionCheckTimer;
+        private const int DEFAULT_PORT = 5000;
 
         public static ServerManager Instance
         {
@@ -43,53 +44,71 @@ namespace LauncherPhantom.Managers
             
             _httpClient = new HttpClient(handler) 
             { 
-                Timeout = TimeSpan.FromSeconds(10)
+                Timeout = TimeSpan.FromSeconds(3) // Reducido a 3 segundos para respuesta rápida
             };
             Debug.WriteLine("[ServerManager] Inicializado");
         }
 
-        public void SetServerUrl(string url)
+        public void SetServerUrl(string ip)
         {
-            if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+            if (string.IsNullOrEmpty(ip))
             {
-                url = "http://" + url;
+                ip = "localhost";
             }
 
-            _serverUrl = url;
-            ConfigManager.Instance.SetSetting("server_url", url);
-            Debug.WriteLine($"[ServerManager] URL actualizada: {url}");
+            // Limpiar: remover http://, https:// y extraer solo la IP (sin puerto)
+            ip = ip.Replace("http://", "").Replace("https://", "").Split(':')[0];
+            
+            // Construir URL con puerto predeterminado
+            _serverUrl = $"http://{ip}:{DEFAULT_PORT}";
+
+            // Guardar solo la IP en config (sin puerto)
+            ConfigManager.Instance.SetSetting("server_url", ip);
+            Debug.WriteLine($"[ServerManager] URL actualizada: {_serverUrl}");
         }
 
         public async Task<bool> TestConnectionAsync()
         {
             try
             {
-                _serverUrl = ConfigManager.Instance.GetSetting("server_url") ?? "http://localhost:5000";
-                
-                if (!_serverUrl.StartsWith("http://") && !_serverUrl.StartsWith("https://"))
+                // Obtener IP guardada
+                var savedIp = ConfigManager.Instance.GetSetting("server_url");
+                if (string.IsNullOrEmpty(savedIp))
                 {
-                    _serverUrl = "http://" + _serverUrl;
+                    savedIp = "localhost";
                 }
+                
+                // Construir URL con puerto
+                _serverUrl = $"http://{savedIp}:{DEFAULT_PORT}";
                 
                 var healthUrl = $"{_serverUrl}/api/launcher/health";                
                 var response = await _httpClient.GetAsync(healthUrl);
                 bool isSuccess = response.IsSuccessStatusCode;
                 
+                if (isSuccess)
+                {
+                    Debug.WriteLine($"[ServerManager] ✓ Conexión OK: {healthUrl}");
+                }
+                else
+                {
+                    Debug.WriteLine($"[ServerManager] ✗ Conexión fallida ({response.StatusCode}): {healthUrl}");
+                }
+                
                 return isSuccess;
             }
             catch (HttpRequestException ex)
             {
-                Debug.WriteLine($"[ServerManager] Error HTTP: {ex.Message}");
+                Debug.WriteLine($"[ServerManager] ✗ Error HTTP: {ex.Message}");
                 return false;
             }
             catch (TaskCanceledException ex)
             {
-                Debug.WriteLine($"[ServerManager] Timeout: {ex.Message}");
+                Debug.WriteLine($"[ServerManager] ✗ Timeout (3s): {ex.Message}");
                 return false;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ServerManager] Error general: {ex.Message}");
+                Debug.WriteLine($"[ServerManager] ✗ Error general: {ex.Message}");
                 return false;
             }
         }
@@ -107,7 +126,6 @@ namespace LauncherPhantom.Managers
                 {
                     try
                     {
-                        // Usar JObject para parsear primero y convertir
                         var jObject = JObject.Parse(content);
                         
                         var versionInfo = new VersionInfo
@@ -120,31 +138,26 @@ namespace LauncherPhantom.Managers
                             Changes = ""
                         };
 
-                        // Convertir el array de cambios a string
                         var changesToken = jObject["changes"];
                         if (changesToken != null)
                         {
                             if (changesToken.Type == JTokenType.Array)
                             {
-                                // Si es un array, convertir a string con saltos de línea
                                 var changesList = changesToken.ToObject<string[]>();
-                                versionInfo.Changes = string.Join("\n", changesList);
+                                versionInfo.Changes = string.Join("\n", changesList ?? Array.Empty<string>());
                             }
                             else if (changesToken.Type == JTokenType.String)
                             {
-                                // Si ya es un string, usar tal cual
                                 versionInfo.Changes = changesToken.ToString();
                             }
                         }
 
                         Debug.WriteLine($"[ServerManager] Versión obtenida: {versionInfo.Version}");
-                        Debug.WriteLine($"[ServerManager] Cambios: {versionInfo.Changes}");
                         return versionInfo;
                     }
                     catch (JsonException ex)
                     {
                         Debug.WriteLine($"[ServerManager] Error parseando JSON: {ex.Message}");
-                        Debug.WriteLine($"[ServerManager] Contenido problemático: {content}");
                         return null;
                     }
                 }
@@ -155,7 +168,6 @@ namespace LauncherPhantom.Managers
             catch (Exception ex)
             {
                 Debug.WriteLine($"[ServerManager] Error en GetVersionAsync: {ex.Message}");
-                Debug.WriteLine($"[ServerManager] StackTrace: {ex.StackTrace}");
                 return null;
             }
         }
@@ -197,7 +209,7 @@ namespace LauncherPhantom.Managers
             }
         }
 
-        public void StartConnectionMonitoring(Func<Task<bool>> connectionCheck, int intervalSeconds = 30)
+        public void StartConnectionMonitoring(Func<Task<bool>> connectionCheck, int intervalSeconds = 5)
         {
             try
             {
@@ -207,6 +219,7 @@ namespace LauncherPhantom.Managers
                     _connectionCheckTimer.Dispose();
                 }
 
+                // Reducido a 5 segundos para detección más rápida (en lugar de 30)
                 _connectionCheckTimer = new System.Timers.Timer(intervalSeconds * 1000);
                 _connectionCheckTimer.Elapsed += async (s, e) =>
                 {
@@ -221,6 +234,8 @@ namespace LauncherPhantom.Managers
                 };
                 _connectionCheckTimer.AutoReset = true;
                 _connectionCheckTimer.Start();
+                
+                Debug.WriteLine($"[ServerManager] Monitoreo de conexión iniciado (intervalo: {intervalSeconds}s)");
             }
             catch (Exception ex)
             {
@@ -237,6 +252,7 @@ namespace LauncherPhantom.Managers
                     _connectionCheckTimer.Stop();
                     _connectionCheckTimer.Dispose();
                     _connectionCheckTimer = null;
+                    Debug.WriteLine("[ServerManager] Monitoreo de conexión detenido");
                 }
             }
             catch (Exception ex)

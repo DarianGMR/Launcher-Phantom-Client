@@ -171,7 +171,7 @@ namespace LauncherPhantom.Views
             try
             {
                 Debug.WriteLine("[RegisterPage] Probando conexión con servidor...");
-                ServerManager.Instance.SetServerUrl($"http://{ServerIpTextBox.Text}");
+                ServerManager.Instance.SetServerUrl(ServerIpTextBox.Text);
                 
                 bool canConnect = await ServerManager.Instance.TestConnectionAsync();
                 if (!canConnect)

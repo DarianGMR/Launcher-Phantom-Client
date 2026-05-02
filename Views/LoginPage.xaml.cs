@@ -25,7 +25,7 @@ namespace LauncherPhantom.Views
                 var connectionError = ConfigManager.Instance.GetSetting("connection_error");
                 if (!string.IsNullOrEmpty(connectionError))
                 {
-                    Debug.WriteLine($"[LoginPage] Conexion perdida: {connectionError}");
+                    Debug.WriteLine($"[LoginPage] Error de conexión detectado: {connectionError}");
                     ShowError(connectionError);
                     ConfigManager.Instance.DeleteSetting("connection_error");
                 }
@@ -46,7 +46,7 @@ namespace LauncherPhantom.Views
                     
                     if (!string.IsNullOrEmpty(savedServerIp))
                     {
-                        var ip = savedServerIp.Replace("http://", "").Replace("https://", "");
+                        var ip = savedServerIp.Replace("http://", "").Replace("https://", "").Split(':')[0];
                         ServerIpTextBox.Text = ip;
                     }
                     
@@ -217,6 +217,7 @@ namespace LauncherPhantom.Views
 
                 var updateSplash = new UpdateCheckSplash();
                 updateSplash.Owner = mainWindow;
+                updateSplash.ShowWithAnimation();
                 var result = updateSplash.ShowDialog();
 
                 if (updateSplash.IsCancelled)

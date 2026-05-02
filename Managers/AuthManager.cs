@@ -15,6 +15,7 @@ namespace LauncherPhantom.Managers
         
         private string? _jwtToken;
         private HttpClient _httpClient;
+        private const int DEFAULT_PORT = 5000;
 
         public static AuthManager Instance
         {
@@ -37,7 +38,7 @@ namespace LauncherPhantom.Managers
         private AuthManager()
         {
             var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true; // Solo para desarrollo
+            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
             
             _httpClient = new HttpClient(handler)
             {
@@ -46,18 +47,28 @@ namespace LauncherPhantom.Managers
             Debug.WriteLine("[AuthManager] Inicializado");
         }
 
+        private string BuildServerUrl()
+        {
+            var ip = ConfigManager.Instance.GetSetting("server_url");
+            if (string.IsNullOrEmpty(ip))
+            {
+                ip = "localhost";
+            }
+
+            // Limpiar IP (remover http://, https://, y extraer solo la IP sin puerto)
+            ip = ip.Replace("http://", "").Replace("https://", "").Split(':')[0];
+
+            // Construir URL con puerto predeterminado
+            var serverUrl = $"http://{ip}:{DEFAULT_PORT}";
+            Debug.WriteLine($"[AuthManager] URL construida: {serverUrl}");
+            return serverUrl;
+        }
+
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
         {
             try
             {
-                var serverUrl = ConfigManager.Instance.GetSetting("server_url") ?? "http://localhost:5000";
-                
-                // Normalizar URL
-                if (!serverUrl.StartsWith("http://") && !serverUrl.StartsWith("https://"))
-                {
-                    serverUrl = "http://" + serverUrl;
-                }
-
+                var serverUrl = BuildServerUrl();
                 var endpoint = $"{serverUrl}/api/auth/login";
 
                 Debug.WriteLine($"[AuthManager] Enviando login a: {endpoint}");
@@ -78,7 +89,7 @@ namespace LauncherPhantom.Managers
                     {
                         _jwtToken = authResponse.Token;
                         
-                        // Save JWT encrypted
+                        // Guardar JWT encriptado
                         ConfigManager.Instance.SetSetting("jwt_token", 
                             EncryptionManager.Instance.Encrypt(authResponse.Token));
                         
@@ -108,14 +119,7 @@ namespace LauncherPhantom.Managers
         {
             try
             {
-                var serverUrl = ConfigManager.Instance.GetSetting("server_url") ?? "http://localhost:5000";
-                
-                // Normalizar URL
-                if (!serverUrl.StartsWith("http://") && !serverUrl.StartsWith("https://"))
-                {
-                    serverUrl = "http://" + serverUrl;
-                }
-
+                var serverUrl = BuildServerUrl();
                 var endpoint = $"{serverUrl}/api/auth/register";
 
                 Debug.WriteLine($"[AuthManager] Enviando registro a: {endpoint}");
@@ -125,6 +129,9 @@ namespace LauncherPhantom.Managers
 
                 var response = await _httpClient.PostAsync(endpoint, content);
                 var responseContent = await response.Content.ReadAsStringAsync();
+
+                Debug.WriteLine($"[AuthManager] Respuesta status: {response.StatusCode}");
+                Debug.WriteLine($"[AuthManager] Respuesta contenido: {responseContent}");
 
                 return JsonConvert.DeserializeObject<AuthResponse>(responseContent) 
                     ?? new AuthResponse { Success = false, Error = "Error desconocido" };

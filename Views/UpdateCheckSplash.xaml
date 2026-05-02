@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Launcher Phantom"
-        Width="600"
-        Height="400"
+        Width="640"
+        Height="480"
         WindowStartupLocation="CenterOwner"
         Background="#0A0E27"
         Foreground="#FFFFFF"
@@ -12,7 +12,7 @@
         Icon="pack://application:,,,/Resources/Images/icon.ico"
         ShowInTaskbar="False">
     
-    <Border BorderBrush="#00D9FF" BorderThickness="2" CornerRadius="10">
+    <Border BorderBrush="Transparent" BorderThickness="0">
         <Grid>
             <!-- Animated Background -->
             <Canvas Background="#0A0E27">
@@ -22,65 +22,113 @@
             </Canvas>
             
             <!-- Content -->
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="450">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="500">
+                
                 <!-- Icon -->
                 <Image x:Name="SplashIcon" 
                        Source="pack://application:,,,/Resources/Images/icon.ico" 
-                       Width="120" 
-                       Height="120" 
-                       Margin="0,0,0,30"
+                       Width="100" 
+                       Height="100" 
+                       Margin="0,0,0,25"
                        HorizontalAlignment="Center"/>
                 
-                <!-- Title -->
-                <TextBlock Text="VERIFICANDO ACTUALIZACIONES" 
-                          Foreground="#00D9FF" 
-                          FontSize="24"
-                          FontWeight="Bold"
-                          TextAlignment="Center"
-                          Margin="0,0,0,30"/>
-                
-                <!-- Checking State -->
-                <Grid x:Name="CheckingGrid" Visibility="Visible">
+                <!-- Status Messages Stack -->
+                <StackPanel x:Name="StatusMessagesStack" VerticalAlignment="Center" HorizontalAlignment="Center" Width="450">
+                    
+                    <!-- Connecting Message -->
+                    <Grid Margin="0,0,0,25">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
+                                <TextBlock x:Name="ConnectingText"
+                                          Text="Conectando con el servidor..." 
+                                          Foreground="#A0A0A0" 
+                                          FontSize="12"
+                                          VerticalAlignment="Center"
+                                          Margin="0,0,10,0"/>
+                                <ProgressBar x:Name="ConnectingSpinner" 
+                                            Width="25" 
+                                            Height="2" 
+                                            Foreground="#00D9FF"
+                                            Background="Transparent"
+                                            IsIndeterminate="True"
+                                            VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Checking Message -->
+                    <Grid Margin="0,0,0,25">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
+                                <TextBlock x:Name="CheckingText"
+                                          Text="Verificando si hay actualización disponible..." 
+                                          Foreground="#A0A0A0" 
+                                          FontSize="12"
+                                          VerticalAlignment="Center"
+                                          Margin="0,0,10,0"
+                                          Opacity="0.3"/>
+                                <ProgressBar x:Name="CheckingSpinner" 
+                                            Width="25" 
+                                            Height="2" 
+                                            Foreground="#00D9FF"
+                                            Background="Transparent"
+                                            IsIndeterminate="True"
+                                            Opacity="0.3"
+                                            VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Status Result -->
+                    <TextBlock x:Name="StatusResult"
+                              Text="" 
+                              Foreground="#39FF14" 
+                              FontSize="13"
+                              FontWeight="Bold"
+                              TextAlignment="Center"
+                              Margin="0,0,0,0"
+                              Visibility="Collapsed"
+                              TextWrapping="Wrap"/>
+
+                </StackPanel>
+
+                <!-- Checking Grid (Loading state) -->
+                <Grid x:Name="CheckingGrid" Visibility="Visible" Margin="0,0,0,0">
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <!-- Spinner -->
                         <ProgressBar x:Name="CheckSpinner" 
-                                    Width="200" 
+                                    Width="250" 
                                     Height="3" 
                                     Foreground="#00D9FF"
                                     Background="#1A1F3A"
                                     IsIndeterminate="True"
-                                    Margin="0,0,0,20"/>
+                                    Margin="0,0,0,15"/>
                         
-                        <!-- Status Text -->
-                        <TextBlock x:Name="CheckingText" 
-                                  Text="Verificando versiones disponibles..." 
+                        <TextBlock Text="Conectando..." 
                                   Foreground="#A0A0A0" 
-                                  FontSize="13"
+                                  FontSize="11"
                                   TextAlignment="Center"/>
                     </StackPanel>
                 </Grid>
-                
-                <!-- No Update Found (Auto-hide after 3 seconds) -->
+
+                <!-- No Update Found -->
                 <Grid x:Name="NoUpdateGrid" Visibility="Collapsed">
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <!-- Icon -->
                         <TextBlock Text="✓" 
                                   Foreground="#00FF00" 
-                                  FontSize="48"
-                                  TextAlignment="Center"
-                                  Margin="0,0,0,15"/>
-                        
-                        <!-- Message -->
-                        <TextBlock Text="Estás actualizado" 
-                                  Foreground="#39FF14" 
-                                  FontSize="18"
-                                  FontWeight="Bold"
+                                  FontSize="44"
                                   TextAlignment="Center"
                                   Margin="0,0,0,10"/>
                         
-                        <TextBlock Text="Tu launcher está en la última versión" 
+                        <TextBlock Text="Ya tienes la última actualización!" 
+                                  Foreground="#39FF14" 
+                                  FontSize="13"
+                                  FontWeight="Bold"
+                                  TextAlignment="Center"
+                                  Margin="0,0,0,8"/>
+                        
+                        <TextBlock Text="Conexión exitosa!" 
                                   Foreground="#A0A0A0" 
-                                  FontSize="12"
+                                  FontSize="11"
                                   TextAlignment="Center"/>
                     </StackPanel>
                 </Grid>
@@ -88,61 +136,115 @@
                 <!-- Update Available -->
                 <Grid x:Name="UpdateGrid" Visibility="Collapsed">
                     <StackPanel>
-                        <!-- Message -->
-                        <TextBlock Text="¡Actualización Disponible!" 
-                                  Foreground="#00D9FF" 
-                                  FontSize="18"
-                                  FontWeight="Bold"
-                                  TextAlignment="Center"
-                                  Margin="0,0,0,15"/>
-                        
-                        <!-- Version Info -->
-                        <Border Background="#1A1F3A" 
-                               CornerRadius="6" 
-                               Padding="15" 
-                               Margin="0,0,0,15"
-                               BorderBrush="#00D9FF"
-                               BorderThickness="1">
-                            <StackPanel>
-                                <TextBlock x:Name="UpdateVersionText" 
-                                          Text="Nueva versión disponible" 
-                                          Foreground="#39FF14" 
-                                          FontSize="13"
-                                          FontWeight="Bold"
-                                          Margin="0,0,0,8"/>
-                                
-                                <TextBlock x:Name="UpdateChangesText" 
-                                          Text="Cambios incluidos en la actualización" 
-                                          Foreground="#A0A0A0" 
-                                          FontSize="12"
-                                          TextWrapping="Wrap"
-                                          MaxHeight="80"/>
-                            </StackPanel>
-                        </Border>
+                        <!-- Update Info -->
+                        <StackPanel Margin="0,0,0,15">
+                            <TextBlock Text="¡Actualización Disponible!" 
+                                      Foreground="#00D9FF" 
+                                      FontSize="14"
+                                      FontWeight="Bold"
+                                      TextAlignment="Center"
+                                      Margin="0,0,0,12"/>
+                            
+                            <!-- Version Info Box -->
+                            <Border Background="#1A1F3A" 
+                                   Padding="15" 
+                                   Margin="0,0,0,15"
+                                   BorderBrush="#00D9FF"
+                                   BorderThickness="1"
+                                   MaxHeight="140">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <StackPanel>
+                                        <TextBlock x:Name="UpdateVersionText" 
+                                                  Text="Nueva versión disponible" 
+                                                  Foreground="#39FF14" 
+                                                  FontSize="11"
+                                                  FontWeight="Bold"
+                                                  Margin="0,0,0,8"
+                                                  TextWrapping="Wrap"/>
+                                        
+                                        <TextBlock x:Name="UpdateChangesText" 
+                                                  Text="Cambios incluidos en la actualización" 
+                                                  Foreground="#B0B0B0" 
+                                                  FontSize="10"
+                                                  TextWrapping="Wrap"
+                                                  LineHeight="15"/>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Border>
+                        </StackPanel>
                         
                         <!-- Buttons -->
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Grid HorizontalAlignment="Center" Width="320">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="15"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Update Button -->
                             <Button x:Name="UpdateButton"
+                                   Grid.Column="0"
                                    Content="Actualizar Ahora" 
                                    Background="#00D9FF"
                                    Foreground="#0A0E27"
-                                   Padding="20,12"
-                                   FontSize="13"
+                                   Padding="15,10"
+                                   FontSize="11"
                                    FontWeight="Bold"
                                    Cursor="Hand"
-                                   Margin="0,0,10,0"
-                                   Click="UpdateButton_Click"/>
-                            
+                                   Click="UpdateButton_Click"
+                                   BorderThickness="0">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" 
+                                               Padding="{TemplateBinding Padding}"
+                                               BorderBrush="{TemplateBinding BorderBrush}"
+                                               BorderThickness="{TemplateBinding BorderThickness}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#00FFFF"/>
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter Property="Background" Value="#00A8CC"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+
+                            <!-- Cancel Button -->
                             <Button x:Name="CancelButton"
+                                   Grid.Column="2"
                                    Content="Cancelar" 
                                    Background="#FF3333"
                                    Foreground="#FFFFFF"
-                                   Padding="20,12"
-                                   FontSize="13"
+                                   Padding="15,10"
+                                   FontSize="11"
                                    FontWeight="Bold"
                                    Cursor="Hand"
-                                   Click="CancelButton_Click"/>
-                        </StackPanel>
+                                   Click="CancelButton_Click"
+                                   BorderThickness="0">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" 
+                                               Padding="{TemplateBinding Padding}"
+                                               BorderBrush="{TemplateBinding BorderBrush}"
+                                               BorderThickness="{TemplateBinding BorderThickness}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#FF6666"/>
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter Property="Background" Value="#CC0000"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </Grid>
                     </StackPanel>
                 </Grid>
             </StackPanel>

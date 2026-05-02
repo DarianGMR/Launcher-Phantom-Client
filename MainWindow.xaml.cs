@@ -68,6 +68,7 @@ namespace LauncherPhantom
                 Debug.WriteLine("[MainWindow] Mostrando Splash Screen...");
                 SplashScreen.Visibility = Visibility.Visible;
                 MainFrame.Visibility = Visibility.Collapsed;
+                SplashScreen.Opacity = 1.0;
                 
                 // Animate loading progress
                 for (int i = 0; i <= 100; i += 5)
@@ -173,7 +174,6 @@ namespace LauncherPhantom
         {
             try
             {
-                
                 // Cambiar tamaño de la ventana según la página
                 if (page is DashboardPage)
                 {
@@ -184,7 +184,23 @@ namespace LauncherPhantom
                     ResizeWindow(LoginWidth, LoginHeight);
                 }
                 
-                MainFrame.Navigate(page);
+                // Aplicar fade-out a la página actual
+                MainFrame.Opacity = 1;
+                var fadeOutAnim = new DoubleAnimation(1.0, 0.0, TimeSpan.FromSeconds(0.3));
+                MainFrame.BeginAnimation(UIElement.OpacityProperty, fadeOutAnim);
+                
+                // Navegar y fade-in
+                Task.Delay(300).ContinueWith(_ =>
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        MainFrame.Navigate(page);
+                        MainFrame.Opacity = 0;
+                        var fadeInAnim = new DoubleAnimation(0.0, 1.0, TimeSpan.FromSeconds(0.3));
+                        MainFrame.BeginAnimation(UIElement.OpacityProperty, fadeInAnim);
+                    });
+                });
+                
                 Debug.WriteLine($"[MainWindow] Navegación exitosa a {page.GetType().Name}");
             }
             catch (Exception ex)

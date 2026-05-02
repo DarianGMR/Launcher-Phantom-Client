@@ -48,8 +48,7 @@ namespace LauncherPhantom.Views
                 
                 StartConnectionMonitoring();
                 
-                // Hacer verificación inicial después de 1 segundo
-                await Task.Delay(1000);
+                // Hacer verificación inicial inmediatamente
                 await VerifyConnectionAsync();
             }
             catch (Exception ex)
@@ -75,13 +74,13 @@ namespace LauncherPhantom.Views
                                 
                 if (!isConnected)
                 {
-                    Debug.WriteLine("[DashboardPage] CONEXIÓN PERDIDA");
+                    Debug.WriteLine("[DashboardPage] ✗ CONEXIÓN PERDIDA - Retornando a Login");
                     await HandleConnectionLoss();
                     return;
                 }
 
                 UpdateConnectionStatus(true);
-                Debug.WriteLine("[DashboardPage] Conexión verificada correctamente");
+                Debug.WriteLine("[DashboardPage] ✓ Conexión verificada correctamente");
             }
             catch (Exception ex)
             {
@@ -94,6 +93,7 @@ namespace LauncherPhantom.Views
         {
             if (_isTransitioning)
             {
+                Debug.WriteLine("[DashboardPage] Ya en transición, ignorando...");
                 return;
             }
 
@@ -102,7 +102,8 @@ namespace LauncherPhantom.Views
                 _isTransitioning = true;
                 _isMonitoring = false;
                 StopConnectionMonitoring();
-                                
+                
+                Debug.WriteLine("[DashboardPage] Guardando error de conexión...");
                 // Guardar el estado de error para mostrarlo en LoginPage
                 ConfigManager.Instance.SetSetting("connection_error", "CONEXIÓN PERDIDA\n\nLa conexión con el servidor se ha interrumpido.");
                 
@@ -111,6 +112,7 @@ namespace LauncherPhantom.Views
                 {
                     try
                     {
+                        Debug.WriteLine("[DashboardPage] Navegando a LoginPage...");
                         ReturnToLogin();
                     }
                     catch (Exception ex)
@@ -160,8 +162,10 @@ namespace LauncherPhantom.Views
             try
             {
                 StopConnectionMonitoring();
-                                
-                _connectionTimer = new System.Timers.Timer(3000); // Verificar cada 3 segundos
+                
+                Debug.WriteLine("[DashboardPage] Iniciando monitoreo de conexión (intervalo: 5s)");
+                // Verificar conexión cada 5 segundos (en lugar de 3)
+                _connectionTimer = new System.Timers.Timer(5000);
                 _connectionTimer.Elapsed += (s, e) =>
                 {
                     if (!_isMonitoring || _isTransitioning)
@@ -176,9 +180,10 @@ namespace LauncherPhantom.Views
                             try
                             {
                                 var isConnected = await ServerManager.Instance.TestConnectionAsync();
-                                                                
+                                
                                 if (!isConnected && _isMonitoring && !_isTransitioning)
                                 {
+                                    Debug.WriteLine("[DashboardPage] [TIMER] Conexión perdida detectada");
                                     await HandleConnectionLoss();
                                 }
                             }
@@ -196,7 +201,6 @@ namespace LauncherPhantom.Views
                 
                 _connectionTimer.AutoReset = true;
                 _connectionTimer.Start();
-                
             }
             catch (Exception ex)
             {
@@ -231,7 +235,6 @@ namespace LauncherPhantom.Views
         {
             try
             {
-                
                 _isMonitoring = false;
                 StopConnectionMonitoring();
                 
