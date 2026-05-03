@@ -87,7 +87,7 @@ namespace LauncherPhantom.Managers
 
                 var fileName = Path.GetFileName(new Uri(versionInfo.DownloadUrl).AbsolutePath);
                 if (string.IsNullOrEmpty(fileName))
-                    fileName = "launcher-update.exe";
+                    fileName = "LauncherPhantom.exe";
 
                 var filePath = Path.Combine(updateFolder, fileName);
 
@@ -174,7 +174,7 @@ namespace LauncherPhantom.Managers
                 System.Reflection.Assembly.GetExecutingAssembly().Location) ?? 
                 Environment.CurrentDirectory;
             
-            return Path.Combine(appFolder, "actualizacion");
+            return Path.Combine(appFolder, "Update");
         }
 
         public void CleanupOldUpdates()
