@@ -25,10 +25,11 @@
 
                 <!-- Barra de Progreso -->
                 <ProgressBar x:Name="ProgressBar" 
-                             Height="28" 
+                             Height="10"
+                             Width="400"
                              Foreground="#00D9FF"
                              Background="#1A1F3A"
-                             Margin="0,0,0,15"
+                             Margin="0,0,0,10"
                              Value="0"
                              BorderBrush="#00D9FF"
                              BorderThickness="1"/>
@@ -40,7 +41,7 @@
                            FontSize="16"
                            FontWeight="Bold"
                            TextAlignment="Center"
-                           Margin="0,0,0,15"/>
+                           Margin="0,0,0,8"/>
 
                 <!-- Información de Descarga -->
                 <StackPanel Margin="0,0,0,15">
@@ -48,13 +49,13 @@
                               Text="0 MB / 0 MB" 
                               Foreground="#A0A0A0" 
                               FontSize="13"
-                              Margin="0,0,0,6"/>
+                              Margin="0,0,0,3"/>
                     
                     <TextBlock x:Name="SpeedText" 
                               Text="Velocidad: 0 MB/s" 
                               Foreground="#A0A0A0" 
                               FontSize="13"
-                              Margin="0,0,0,6"/>
+                              Margin="0,0,0,3"/>
                     
                     <TextBlock x:Name="TimeRemainingText" 
                               Text="Tiempo restante: Calculando..." 
@@ -69,7 +70,7 @@
                            FontSize="12"
                            TextAlignment="Center"
                            TextWrapping="Wrap"
-                           Margin="0,0,0,25"/>
+                           Margin="0,0,0,10"/>
 
                 <!-- Botón Cancelar - Centrado -->
                 <Button x:Name="CancelDownloadButton" 
