@@ -1,5 +1,7 @@
 using System;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -8,7 +10,7 @@ using LauncherPhantom.Models;
 
 namespace LauncherPhantom.Views
 {
-    public partial class UpdateCheckSplash : Window
+    public partial class UpdateCheckSplash : Page
     {
         public bool IsUpdateApplied { get; private set; } = false;
         public bool IsCancelled { get; private set; } = false;
@@ -26,17 +28,22 @@ namespace LauncherPhantom.Views
             }
         }
 
-        public void ShowWithAnimation()
+        private void AnimateLoadingBar()
         {
             try
             {
-                this.Opacity = 0;
-                var fadeInAnim = new DoubleAnimation(0.0, 1.0, TimeSpan.FromSeconds(0.3));
-                this.BeginAnimation(Window.OpacityProperty, fadeInAnim);
+                // Crear animación de barra que sale desde el inicio y desaparece al final
+                var animation = new DoubleAnimation(0, 100, TimeSpan.FromSeconds(1.5))
+                {
+                    RepeatBehavior = RepeatBehavior.Forever,
+                    AutoReverse = false
+                };
+                
+                LoadingBar.BeginAnimation(ProgressBar.ValueProperty, animation);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[UpdateCheckSplash] Error en ShowWithAnimation: {ex.Message}");
+                Debug.WriteLine($"[UpdateCheckSplash] Error en AnimateLoadingBar: {ex.Message}");
             }
         }
 
@@ -46,29 +53,19 @@ namespace LauncherPhantom.Views
             {
                 Debug.WriteLine("[UpdateCheckSplash] Iniciando verificación de actualizaciones...");
                 
-                CheckingGrid.Visibility = Visibility.Visible;
-                UpdateGrid.Visibility = Visibility.Collapsed;
-                NoUpdateGrid.Visibility = Visibility.Collapsed;
-                StatusMessagesStack.Visibility = Visibility.Collapsed;
+                // Mostrar barra grande de carga y mensaje inicial
+                AnimateLoadingBar();
+                StatusMessageText.Text = "Conectando con el servidor...";
+                StatusMessagesStack.Visibility = Visibility.Visible;
 
                 // Esperar 1 segundo antes de empezar
                 await Task.Delay(1000);
 
-                // Mostrar stack de mensajes
-                CheckingGrid.Visibility = Visibility.Collapsed;
-                StatusMessagesStack.Visibility = Visibility.Visible;
-
-                // Animar primer mensaje
-                await AnimateConnectingMessageAsync();
+                // Primer mensaje: Conectando (2 segundos)
+                await Task.Delay(2000);
                 
-                // Esperar 2 segundos para leer
-                await Task.Delay(2000);
-
-                // Animar segundo mensaje
-                await AnimateCheckingMessageAsync();
-
-                // Esperar 2 segundos para leer
-                await Task.Delay(2000);
+                // Segundo mensaje: Verificando (2 segundos)
+                await ShowStatusMessageAsync("Verificando si hay actualización disponible...");
 
                 // Verificar actualizaciones
                 var (hasUpdate, versionInfo) = await UpdateManager.Instance.CheckForUpdatesAsync();
@@ -90,37 +87,29 @@ namespace LauncherPhantom.Views
             }
         }
 
-        private async Task AnimateConnectingMessageAsync()
+        private async Task ShowStatusMessageAsync(string message)
         {
             try
             {
-                // Fade in del primer mensaje
+                // Fade out del mensaje actual
+                var fadeOut = new DoubleAnimation(1.0, 0.0, TimeSpan.FromSeconds(0.3));
+                StatusMessageText.BeginAnimation(UIElement.OpacityProperty, fadeOut);
+
+                await Task.Delay(300);
+
+                // Cambiar texto y fade in
+                StatusMessageText.Text = message;
+                StatusMessageText.Opacity = 0;
+
                 var fadeIn = new DoubleAnimation(0.0, 1.0, TimeSpan.FromSeconds(0.3));
-                ConnectingText.BeginAnimation(UIElement.OpacityProperty, fadeIn);
-                ConnectingSpinner.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+                StatusMessageText.BeginAnimation(UIElement.OpacityProperty, fadeIn);
 
-                await Task.Delay(300);
+                // Esperar 2 segundos de visualización
+                await Task.Delay(2000);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[UpdateCheckSplash] Error en AnimateConnectingMessageAsync: {ex.Message}");
-            }
-        }
-
-        private async Task AnimateCheckingMessageAsync()
-        {
-            try
-            {
-                // Fade in del segundo mensaje
-                var fadeIn = new DoubleAnimation(0.3, 1.0, TimeSpan.FromSeconds(0.3));
-                CheckingText.BeginAnimation(UIElement.OpacityProperty, fadeIn);
-                CheckingSpinner.BeginAnimation(UIElement.OpacityProperty, fadeIn);
-
-                await Task.Delay(300);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[UpdateCheckSplash] Error en AnimateCheckingMessageAsync: {ex.Message}");
+                Debug.WriteLine($"[UpdateCheckSplash] Error en ShowStatusMessageAsync: {ex.Message}");
             }
         }
 
@@ -128,22 +117,18 @@ namespace LauncherPhantom.Views
         {
             try
             {
-                // Mostrar resultado
-                StatusResult.Text = "Ya tienes la última actualización!\nConexión exitosa!";
-                StatusResult.Visibility = Visibility.Visible;
-                
-                var fadeIn = new DoubleAnimation(0.0, 1.0, TimeSpan.FromSeconds(0.5));
-                StatusResult.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+                // Detener animación de la barra
+                LoadingBar.BeginAnimation(ProgressBar.ValueProperty, null);
 
-                await Task.Delay(800);
-
-                // Fade out de mensajes
+                // Fade out del loading bar y mensaje
                 var fadeOut = new DoubleAnimation(1.0, 0.0, TimeSpan.FromSeconds(0.3));
+                LoadingBarContainer.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 StatusMessagesStack.BeginAnimation(UIElement.OpacityProperty, fadeOut);
 
                 await Task.Delay(300);
 
                 // Mostrar grid sin actualización
+                LoadingBarContainer.Visibility = Visibility.Collapsed;
                 StatusMessagesStack.Visibility = Visibility.Collapsed;
                 NoUpdateGrid.Visibility = Visibility.Visible;
 
@@ -155,8 +140,11 @@ namespace LauncherPhantom.Views
                 // Cerrar automáticamente después de 2 segundos
                 await Task.Delay(2000);
 
-                IsUpdateApplied = false;
-                Close();
+                // Navegar al dashboard
+                if (Window.GetWindow(this) is MainWindow mainWindow)
+                {
+                    mainWindow.NavigateTo(new DashboardPage());
+                }
             }
             catch (Exception ex)
             {
@@ -168,17 +156,12 @@ namespace LauncherPhantom.Views
         {
             try
             {
-                // Mostrar resultado
-                StatusResult.Text = "¡Actualización disponible encontrada!";
-                StatusResult.Visibility = Visibility.Visible;
-                
-                var fadeIn = new DoubleAnimation(0.0, 1.0, TimeSpan.FromSeconds(0.5));
-                StatusResult.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+                // Detener animación de la barra
+                LoadingBar.BeginAnimation(ProgressBar.ValueProperty, null);
 
-                await Task.Delay(800);
-
-                // Fade out de mensajes
+                // Fade out del loading bar y mensaje
                 var fadeOut = new DoubleAnimation(1.0, 0.0, TimeSpan.FromSeconds(0.3));
+                LoadingBarContainer.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 StatusMessagesStack.BeginAnimation(UIElement.OpacityProperty, fadeOut);
 
                 await Task.Delay(300);
@@ -187,6 +170,7 @@ namespace LauncherPhantom.Views
                 UpdateVersionText.Text = $"v{Constants.AppVersion} → v{versionInfo.Version}";
                 UpdateChangesText.Text = versionInfo.Changes;
 
+                LoadingBarContainer.Visibility = Visibility.Collapsed;
                 StatusMessagesStack.Visibility = Visibility.Collapsed;
                 UpdateGrid.Visibility = Visibility.Visible;
 
@@ -205,20 +189,18 @@ namespace LauncherPhantom.Views
         {
             try
             {
-                CheckingGrid.Visibility = Visibility.Collapsed;
-                StatusMessagesStack.Visibility = Visibility.Visible;
-
-                StatusResult.Text = "Error: No se pudo conectar con el servidor";
-                StatusResult.Foreground = new System.Windows.Media.SolidColorBrush(
-                    (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF3333"));
-                StatusResult.Visibility = Visibility.Visible;
+                StatusMessageText.Text = "Error: No se pudo conectar con el servidor";
+                StatusMessageText.Foreground = new SolidColorBrush(
+                    (Color)ColorConverter.ConvertFromString("#FF3333"));
 
                 Task.Delay(3000).ContinueWith(_ =>
                 {
                     Dispatcher.Invoke(() =>
                     {
-                        IsCancelled = true;
-                        Close();
+                        if (Window.GetWindow(this) is MainWindow mainWindow)
+                        {
+                            mainWindow.NavigateTo(new LoginPage());
+                        }
                     });
                 });
             }
@@ -243,14 +225,17 @@ namespace LauncherPhantom.Views
                 }
 
                 var downloadWindow = new DownloadProgressWindow();
-                downloadWindow.Owner = this;
+                downloadWindow.Owner = Window.GetWindow(this);
                 downloadWindow.ShowDialog();
 
                 if (downloadWindow.DialogResult == true)
                 {
-                    IsUpdateApplied = true;
-                    Close();
+                    Application.Current.Shutdown();
+                    return;
                 }
+
+                UpdateButton.IsEnabled = true;
+                CancelButton.IsEnabled = true;
             }
             catch (Exception ex)
             {
@@ -265,15 +250,14 @@ namespace LauncherPhantom.Views
         {
             try
             {                
-                MessageBox.Show(
-                    "Es necesario actualizar el launcher para conectarse al servidor.",
-                    "Actualización Requerida",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning
-                );
+                // Guardar error de actualización requerida
+                ConfigManager.Instance.SetSetting("update_required_error", "Se requiere actualización");
                 
-                IsCancelled = true;
-                Close();
+                // Navegar a LoginPage sin mostrar MessageBox
+                if (Window.GetWindow(this) is MainWindow mainWindow)
+                {
+                    mainWindow.NavigateTo(new LoginPage());
+                }
             }
             catch (Exception ex)
             {

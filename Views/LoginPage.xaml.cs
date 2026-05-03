@@ -20,6 +20,14 @@ namespace LauncherPhantom.Views
         {
             try
             {
+                // Verificar si hay error de actualización requerida
+                var updateRequiredError = ConfigManager.Instance.GetSetting("update_required_error");
+                if (!string.IsNullOrEmpty(updateRequiredError))
+                {
+                    Debug.WriteLine($"[LoginPage] Error de actualización detectado: {updateRequiredError}");
+                    ShowError(updateRequiredError);
+                    ConfigManager.Instance.DeleteSetting("update_required_error");
+                }
                 
                 // Verificar si hay error de conexión desde el dashboard
                 var connectionError = ConfigManager.Instance.GetSetting("connection_error");
@@ -190,7 +198,11 @@ namespace LauncherPhantom.Views
 
                 Debug.WriteLine("[LoginPage] Login exitoso!");
 
-                await ShowUpdateCheckSplashAsync();
+                // Navegar a UpdateCheckSplash
+                if (Window.GetWindow(this) is MainWindow mainWindow)
+                {
+                    mainWindow.NavigateTo(new UpdateCheckSplash());
+                }
 
                 LoginButton.IsEnabled = true;
                 LoginButton.Content = "Iniciar Sesión";
@@ -201,45 +213,6 @@ namespace LauncherPhantom.Views
                 ShowError($"Error: {ex.Message}");
                 LoginButton.IsEnabled = true;
                 LoginButton.Content = "Iniciar Sesión";
-            }
-        }
-
-        private async Task ShowUpdateCheckSplashAsync()
-        {
-            try
-            {
-                
-                var mainWindow = Window.GetWindow(this) as MainWindow;
-                if (mainWindow == null)
-                {
-                    throw new Exception("MainWindow no encontrada");
-                }
-
-                var updateSplash = new UpdateCheckSplash();
-                updateSplash.Owner = mainWindow;
-                updateSplash.ShowWithAnimation();
-                var result = updateSplash.ShowDialog();
-
-                if (updateSplash.IsCancelled)
-                {
-                    ShowError("Es necesario actualizar para continuar.");
-                    await Task.Delay(2000);
-                    return;
-                }
-
-                if (updateSplash.IsUpdateApplied)
-                {
-                    Debug.WriteLine("[LoginPage] Actualización aplicada, cerrando aplicación");
-                    Application.Current.Shutdown();
-                    return;
-                }
-
-                mainWindow.NavigateTo(new DashboardPage());
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[LoginPage] Error en ShowUpdateCheckSplashAsync: {ex.Message}");
-                ShowError($"Error verificando actualizaciones: {ex.Message}");
             }
         }
 
