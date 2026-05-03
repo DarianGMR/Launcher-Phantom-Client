@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Net.Http;
@@ -46,12 +47,12 @@ namespace LauncherPhantom.Managers
         {
             try
             {
-                Debug.WriteLine("[UpdateManager] Verificando actualizaciones...");
+                Debug.WriteLine("[UPDATE] Verificando actualizaciones...");
                 
                 var versionInfo = await ServerManager.Instance.GetVersionAsync();
                 if (versionInfo == null)
                 {
-                    Debug.WriteLine("[UpdateManager] VersionInfo es nulo");
+                    Debug.WriteLine("[UPDATE] VersionInfo es nulo");
                     return (false, null);
                 }
 
@@ -59,30 +60,29 @@ namespace LauncherPhantom.Managers
                 var newVersion = new Version(versionInfo.Version);
 
                 bool hasUpdate = newVersion > currentVersion;
-                Debug.WriteLine($"[UpdateManager] Versión actual: {currentVersion}, Nueva: {newVersion}, Tiene update: {hasUpdate}");
+                Debug.WriteLine($"[UPDATE] Versión actual: {currentVersion}, Nueva: {newVersion}, Tiene update: {hasUpdate}");
                 
                 return (hasUpdate, versionInfo);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[UpdateManager] Error en CheckForUpdatesAsync: {ex.Message}");
-                Debug.WriteLine($"[UpdateManager] StackTrace: {ex.StackTrace}");
+                Debug.WriteLine($"[UPDATE] Error en CheckForUpdatesAsync: {ex.Message}");
                 return (false, null);
             }
         }
 
-        public async Task<string> DownloadUpdateAsync(VersionInfo versionInfo, Action<int, long, long>? progressCallback)
+        public async Task<string> DownloadUpdateAsync(VersionInfo versionInfo, CancellationToken cancellationToken, Action<int, long, long>? progressCallback)
         {
             try
             {
-                Debug.WriteLine("[UpdateManager] Descargando actualización...");
+                Debug.WriteLine("[UPDATE] Descargando actualización...");
                 
                 // Crear carpeta de actualización
                 var updateFolder = GetUpdateFolder();
                 if (!Directory.Exists(updateFolder))
                 {
                     Directory.CreateDirectory(updateFolder);
-                    Debug.WriteLine($"[UpdateManager] Carpeta de actualización creada: {updateFolder}");
+                    Debug.WriteLine($"[UPDATE] Carpeta de actualización creada: {updateFolder}");
                 }
 
                 var fileName = Path.GetFileName(new Uri(versionInfo.DownloadUrl).AbsolutePath);
@@ -91,8 +91,8 @@ namespace LauncherPhantom.Managers
 
                 var filePath = Path.Combine(updateFolder, fileName);
 
-                // Descargar archivo
-                using (var response = await _httpClient.GetAsync(versionInfo.DownloadUrl, HttpCompletionOption.ResponseHeadersRead))
+                // Descargar archivo con soporte para cancelación
+                using (var response = await _httpClient.GetAsync(versionInfo.DownloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
                 {
                     response.EnsureSuccessStatusCode();
                     
@@ -108,34 +108,39 @@ namespace LauncherPhantom.Managers
 
                         do
                         {
-                            var read = await contentStream.ReadAsync(buffer, 0, buffer.Length);
+                            cancellationToken.ThrowIfCancellationRequested();
+
+                            var read = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
                             if (read == 0)
                             {
                                 isMoreToRead = false;
                             }
                             else
                             {
-                                await fileStream.WriteAsync(buffer, 0, read);
+                                await fileStream.WriteAsync(buffer, 0, read, cancellationToken);
                                 totalRead += read;
 
                                 if (canReportProgress)
                                 {
                                     var percentage = (int)((totalRead * 100) / totalBytes);
                                     progressCallback?.Invoke(percentage, totalRead, totalBytes);
-                                    Debug.WriteLine($"[UpdateManager] Descarga: {percentage}% ({totalRead}/{totalBytes} bytes)");
                                 }
                             }
                         } while (isMoreToRead);
                     }
                 }
 
-                Debug.WriteLine($"[UpdateManager] Descarga completada: {filePath}");
+                Debug.WriteLine($"[UPDATE] Descarga completada: {filePath}");
                 return filePath;
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.WriteLine("[UPDATE] Descarga cancelada");
+                throw;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[UpdateManager] Error en DownloadUpdateAsync: {ex.Message}");
-                Debug.WriteLine($"[UpdateManager] StackTrace: {ex.StackTrace}");
+                Debug.WriteLine($"[UPDATE] Error en DownloadUpdateAsync: {ex.Message}");
                 throw new Exception($"Error descargando actualización: {ex.Message}");
             }
         }
@@ -144,7 +149,7 @@ namespace LauncherPhantom.Managers
         {
             try
             {
-                Debug.WriteLine($"[UpdateManager] Aplicando actualización: {installerPath}");
+                Debug.WriteLine($"[UPDATE] Aplicando actualización: {installerPath}");
                 
                 if (!File.Exists(installerPath))
                 {
@@ -163,7 +168,7 @@ namespace LauncherPhantom.Managers
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[UpdateManager] Error en ApplyUpdate: {ex.Message}");
+                Debug.WriteLine($"[UPDATE] Error en ApplyUpdate: {ex.Message}");
                 throw new Exception($"Error aplicando actualización: {ex.Message}");
             }
         }
@@ -190,18 +195,18 @@ namespace LauncherPhantom.Managers
                         try
                         {
                             File.Delete(file);
-                            Debug.WriteLine($"[UpdateManager] Archivo eliminado: {file}");
+                            Debug.WriteLine($"[UPDATE] Archivo eliminado: {file}");
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine($"[UpdateManager] Error eliminando archivo: {ex.Message}");
+                            Debug.WriteLine($"[UPDATE] Error eliminando archivo: {ex.Message}");
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[UpdateManager] Error en CleanupOldUpdates: {ex.Message}");
+                Debug.WriteLine($"[UPDATE] Error en CleanupOldUpdates: {ex.Message}");
             }
         }
     }

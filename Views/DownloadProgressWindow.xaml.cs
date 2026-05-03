@@ -1,7 +1,9 @@
 using System;
 using System.Windows;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 using LauncherPhantom.Managers;
 
 namespace LauncherPhantom.Views
@@ -12,6 +14,8 @@ namespace LauncherPhantom.Views
         private DateTime _startTime;
         private long _lastBytesDownloaded = 0;
         private DateTime _lastSpeedCheckTime;
+        private CancellationTokenSource? _cancellationTokenSource;
+        private string _downloadedFilePath = "";
 
         public DownloadProgressWindow()
         {
@@ -30,11 +34,13 @@ namespace LauncherPhantom.Views
         {
             try
             {
-                Debug.WriteLine("[DownloadProgressWindow] Iniciando descarga...");
+                Debug.WriteLine("[DOWNLOAD] Iniciando descarga...");
                 
                 _isDownloading = true;
                 _startTime = DateTime.Now;
                 _lastSpeedCheckTime = DateTime.Now;
+                _cancellationTokenSource = new CancellationTokenSource();
+                _downloadedFilePath = "";
                 CancelDownloadButton.IsEnabled = true;
 
                 // Obtener información de versión
@@ -47,16 +53,19 @@ namespace LauncherPhantom.Views
 
                 StatusText.Text = "Descargando archivo de actualización...";
 
-                // Descargar actualización
+                // Descargar actualización con soporte para cancelación
                 string filePath = await UpdateManager.Instance.DownloadUpdateAsync(
                     versionInfo,
+                    _cancellationTokenSource.Token,
                     (percentage, downloadedBytes, totalBytes) =>
                     {
                         Dispatcher.Invoke(() => UpdateProgress(percentage, downloadedBytes, totalBytes));
                     }
                 );
 
-                Debug.WriteLine($"[DownloadProgressWindow] Descarga completada: {filePath}");
+                _downloadedFilePath = filePath;
+                
+                Debug.WriteLine($"[DOWNLOAD] Descarga completada: {filePath}");
                 
                 _isDownloading = false;
                 ProgressBar.Value = 100;
@@ -70,10 +79,46 @@ namespace LauncherPhantom.Views
                 DialogResult = true;
                 Close();
             }
+            catch (OperationCanceledException)
+            {
+                Debug.WriteLine("[DOWNLOAD] Descarga cancelada por el usuario");
+                _isDownloading = false;
+                
+                // Eliminar el archivo descargado parcialmente
+                if (!string.IsNullOrEmpty(_downloadedFilePath) && File.Exists(_downloadedFilePath))
+                {
+                    try
+                    {
+                        File.Delete(_downloadedFilePath);
+                        Debug.WriteLine($"[DOWNLOAD] Archivo eliminado: {_downloadedFilePath}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[DOWNLOAD] Error eliminando archivo: {ex.Message}");
+                    }
+                }
+                
+                ShowError("Descarga cancelada por el usuario");
+            }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[DownloadProgressWindow] Error en StartDownloadAsync: {ex.Message}");
-                Debug.WriteLine($"[DownloadProgressWindow] StackTrace: {ex.StackTrace}");
+                Debug.WriteLine($"[DOWNLOAD] Error en StartDownloadAsync: {ex.Message}");
+                Debug.WriteLine($"[DOWNLOAD] StackTrace: {ex.StackTrace}");
+                
+                // Eliminar archivo si hubo error
+                if (!string.IsNullOrEmpty(_downloadedFilePath) && File.Exists(_downloadedFilePath))
+                {
+                    try
+                    {
+                        File.Delete(_downloadedFilePath);
+                        Debug.WriteLine($"[DOWNLOAD] Archivo eliminado por error: {_downloadedFilePath}");
+                    }
+                    catch
+                    {
+                        // Ignorar error al eliminar
+                    }
+                }
+                
                 ShowError($"Error descargando actualización: {ex.Message}");
             }
         }
@@ -113,11 +158,11 @@ namespace LauncherPhantom.Views
                     _lastSpeedCheckTime = now;
                 }
 
-                Debug.WriteLine($"[DownloadProgressWindow] Progreso: {percentage}% ({downloadedMB:F2}MB / {totalMB:F2}MB)");
+                Debug.WriteLine($"[DOWNLOAD] Progreso: {percentage}% ({downloadedMB:F2}MB / {totalMB:F2}MB)");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[DownloadProgressWindow] Error en UpdateProgress: {ex.Message}");
+                Debug.WriteLine($"[DOWNLOAD] Error en UpdateProgress: {ex.Message}");
             }
         }
 
@@ -136,11 +181,11 @@ namespace LauncherPhantom.Views
                 );
                 CancelDownloadButton.IsEnabled = true;
 
-                Debug.WriteLine($"[DownloadProgressWindow] Error mostrado: {message}");
+                Debug.WriteLine($"[DOWNLOAD] Error mostrado: {message}");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[DownloadProgressWindow] Error mostrando error: {ex.Message}");
+                Debug.WriteLine($"[DOWNLOAD] Error mostrando error: {ex.Message}");
             }
         }
 
@@ -150,16 +195,21 @@ namespace LauncherPhantom.Views
             {
                 if (_isDownloading)
                 {
+                    _cancellationTokenSource?.Cancel();
                     _isDownloading = false;
-                    StatusText.Text = "Descarga cancelada";
+                    StatusText.Text = "Cancelando descarga...";
+                    CancelDownloadButton.IsEnabled = false;
+                    Debug.WriteLine("[DOWNLOAD] Cancelación solicitada");
                 }
-                
-                DialogResult = false;
-                Close();
+                else
+                {
+                    DialogResult = false;
+                    Close();
+                }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[DownloadProgressWindow] Error en CancelDownloadButton_Click: {ex.Message}");
+                Debug.WriteLine($"[DOWNLOAD] Error en CancelDownloadButton_Click: {ex.Message}");
             }
         }
 
@@ -167,15 +217,16 @@ namespace LauncherPhantom.Views
         {
             try
             {
-                if (_isDownloading)
+                if (_isDownloading && CancelDownloadButton.IsEnabled)
                 {
                     e.Cancel = true;
-                    MessageBox.Show("Por favor espere a que se complete la descarga", "Descargando", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
+                
+                _cancellationTokenSource?.Dispose();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[DownloadProgressWindow] Error en Window_Closing: {ex.Message}");
+                Debug.WriteLine($"[DOWNLOAD] Error en Window_Closing: {ex.Message}");
             }
         }
     }

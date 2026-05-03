@@ -44,9 +44,9 @@ namespace LauncherPhantom.Managers
             
             _httpClient = new HttpClient(handler) 
             { 
-                Timeout = TimeSpan.FromSeconds(3) // Reducido a 3 segundos para respuesta rápida
+                Timeout = TimeSpan.FromSeconds(3)
             };
-            Debug.WriteLine("[ServerManager] Inicializado");
+            Debug.WriteLine("[SERVER] Inicializado");
         }
 
         public void SetServerUrl(string ip)
@@ -56,29 +56,24 @@ namespace LauncherPhantom.Managers
                 ip = "localhost";
             }
 
-            // Limpiar: remover http://, https:// y extraer solo la IP (sin puerto)
             ip = ip.Replace("http://", "").Replace("https://", "").Split(':')[0];
             
-            // Construir URL con puerto predeterminado
             _serverUrl = $"http://{ip}:{DEFAULT_PORT}";
 
-            // Guardar solo la IP en config (sin puerto)
             ConfigManager.Instance.SetSetting("server_url", ip);
-            Debug.WriteLine($"[ServerManager] URL actualizada: {_serverUrl}");
+            Debug.WriteLine($"[SERVER] URL actualizada: {_serverUrl}");
         }
 
         public async Task<bool> TestConnectionAsync()
         {
             try
             {
-                // Obtener IP guardada
                 var savedIp = ConfigManager.Instance.GetSetting("server_url");
                 if (string.IsNullOrEmpty(savedIp))
                 {
                     savedIp = "localhost";
                 }
                 
-                // Construir URL con puerto
                 _serverUrl = $"http://{savedIp}:{DEFAULT_PORT}";
                 
                 var healthUrl = $"{_serverUrl}/api/launcher/health";                
@@ -87,28 +82,28 @@ namespace LauncherPhantom.Managers
                 
                 if (isSuccess)
                 {
-                    Debug.WriteLine($"[ServerManager] ✓ Conexión OK: {healthUrl}");
+                    Debug.WriteLine($"[SERVER] ✓ Conexión OK");
                 }
                 else
                 {
-                    Debug.WriteLine($"[ServerManager] ✗ Conexión fallida ({response.StatusCode}): {healthUrl}");
+                    Debug.WriteLine($"[SERVER] ✗ Conexión fallida ({response.StatusCode})");
                 }
                 
                 return isSuccess;
             }
-            catch (HttpRequestException ex)
+            catch (HttpRequestException)
             {
-                Debug.WriteLine($"[ServerManager] ✗ Error HTTP: {ex.Message}");
+                Debug.WriteLine($"[SERVER] ✗ Error HTTP");
                 return false;
             }
-            catch (TaskCanceledException ex)
+            catch (TaskCanceledException)
             {
-                Debug.WriteLine($"[ServerManager] ✗ Timeout (3s): {ex.Message}");
+                Debug.WriteLine($"[SERVER] ✗ Timeout (3s)");
                 return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Debug.WriteLine($"[ServerManager] ✗ Error general: {ex.Message}");
+                Debug.WriteLine($"[SERVER] ✗ Error general");
                 return false;
             }
         }
@@ -117,7 +112,7 @@ namespace LauncherPhantom.Managers
         {
             try
             {
-                Debug.WriteLine("[ServerManager] Obteniendo versión...");
+                Debug.WriteLine("[SERVER] Obteniendo versión desde update.json...");
                 
                 var response = await _httpClient.GetAsync($"{_serverUrl}/api/launcher/version");
                 var content = await response.Content.ReadAsStringAsync();
@@ -152,22 +147,22 @@ namespace LauncherPhantom.Managers
                             }
                         }
 
-                        Debug.WriteLine($"[ServerManager] Versión obtenida: {versionInfo.Version}");
+                        Debug.WriteLine($"[SERVER] Versión obtenida: {versionInfo.Version}");
                         return versionInfo;
                     }
-                    catch (JsonException ex)
+                    catch (JsonException)
                     {
-                        Debug.WriteLine($"[ServerManager] Error parseando JSON: {ex.Message}");
+                        Debug.WriteLine($"[SERVER] Error parseando JSON");
                         return null;
                     }
                 }
                 
-                Debug.WriteLine($"[ServerManager] Error obteniendo versión: {response.StatusCode}");
+                Debug.WriteLine($"[SERVER] Error obteniendo versión: {response.StatusCode}");
                 return null;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Debug.WriteLine($"[ServerManager] Error en GetVersionAsync: {ex.Message}");
+                Debug.WriteLine($"[SERVER] Error en GetVersionAsync");
                 return null;
             }
         }
@@ -202,9 +197,9 @@ namespace LauncherPhantom.Managers
 
                 return downloadPath;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Debug.WriteLine($"[ServerManager] Error descargando archivo: {ex.Message}");
+                Debug.WriteLine($"[SERVER] Error descargando archivo");
                 throw;
             }
         }
@@ -219,27 +214,26 @@ namespace LauncherPhantom.Managers
                     _connectionCheckTimer.Dispose();
                 }
 
-                // Reducido a 5 segundos para detección más rápida (en lugar de 30)
                 _connectionCheckTimer = new System.Timers.Timer(intervalSeconds * 1000);
                 _connectionCheckTimer.Elapsed += async (s, e) =>
                 {
                     try
                     {
-                        var isConnected = await connectionCheck();
+                        await connectionCheck();
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        Debug.WriteLine($"[ServerManager] Error verificando conexión: {ex.Message}");
+                        Debug.WriteLine($"[SERVER] Error verificando conexión");
                     }
                 };
                 _connectionCheckTimer.AutoReset = true;
                 _connectionCheckTimer.Start();
                 
-                Debug.WriteLine($"[ServerManager] Monitoreo de conexión iniciado (intervalo: {intervalSeconds}s)");
+                Debug.WriteLine($"[SERVER] Monitoreo iniciado");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Debug.WriteLine($"[ServerManager] Error iniciando monitoreo: {ex.Message}");
+                Debug.WriteLine($"[SERVER] Error iniciando monitoreo");
             }
         }
 
@@ -252,12 +246,12 @@ namespace LauncherPhantom.Managers
                     _connectionCheckTimer.Stop();
                     _connectionCheckTimer.Dispose();
                     _connectionCheckTimer = null;
-                    Debug.WriteLine("[ServerManager] Monitoreo de conexión detenido");
+                    Debug.WriteLine("[SERVER] Monitoreo detenido");
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Debug.WriteLine($"[ServerManager] Error deteniendo monitoreo: {ex.Message}");
+                Debug.WriteLine($"[SERVER] Error deteniendo monitoreo");
             }
         }
     }
