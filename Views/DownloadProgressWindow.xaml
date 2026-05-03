@@ -15,7 +15,7 @@
     
     <Border Background="#0A0E27" CornerRadius="12" BorderBrush="#00D9FF" BorderThickness="2">
         <Grid Margin="40">
-            <StackPanel VerticalAlignment="Stretch" Spacing="5">
+            <StackPanel VerticalAlignment="Stretch">
                 <!-- Título -->
                 <TextBlock Text="Descargando Actualización" 
                            FontSize="20" 
