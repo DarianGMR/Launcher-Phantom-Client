@@ -25,13 +25,15 @@
             
             <!-- Large Loading Bar with Animation -->
             <Grid x:Name="LoadingBarContainer" Margin="0,0,0,20" Height="50" HorizontalAlignment="Center" Width="300">
-                <Border Background="#1A1F3A" Height="6" VerticalAlignment="Center">
+                <Border Background="#1A1F3A" Height="8" VerticalAlignment="Center" CornerRadius="4">
                     <Grid ClipToBounds="True">
-                        <Rectangle x:Name="LoadingBarIndicator"
-                                  Width="80"
-                                  Height="6"
-                                  Fill="#00D9FF"
-                                  HorizontalAlignment="Left"/>
+                        <Canvas>
+                            <Rectangle x:Name="LoadingBar"
+                                      Width="60"
+                                      Height="8"
+                                      Fill="#00D9FF"
+                                      Canvas.Left="0"/>
+                        </Canvas>
                     </Grid>
                 </Border>
             </Grid>
@@ -52,22 +54,9 @@
             <!-- No Update Found -->
             <Grid x:Name="NoUpdateGrid" Visibility="Collapsed">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="✓" 
-                              Foreground="#00FF00" 
-                              FontSize="48"
-                              TextAlignment="Center"
-                              Margin="0,0,0,10"/>
-                    
-                    <TextBlock Text="Ya tienes la última actualización!" 
-                              Foreground="#39FF14" 
-                              FontSize="13"
-                              FontWeight="Bold"
-                              TextAlignment="Center"
-                              Margin="0,0,0,8"/>
-                    
                     <TextBlock Text="Conexión exitosa!" 
                               Foreground="#A0A0A0" 
-                              FontSize="11"
+                              FontSize="20"
                               TextAlignment="Center"/>
                 </StackPanel>
             </Grid>

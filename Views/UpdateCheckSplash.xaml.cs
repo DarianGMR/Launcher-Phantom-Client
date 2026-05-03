@@ -32,14 +32,14 @@ namespace LauncherPhantom.Views
         {
             try
             {
-                // Crear animación de barra que sale desde el inicio y desaparece al final
-                var animation = new DoubleAnimation(0, 100, TimeSpan.FromSeconds(1.5))
+                // Animación suave y rápida de la barra moviéndose de izquierda a derecha
+                var animation = new DoubleAnimation(0, 240, TimeSpan.FromSeconds(1.8))
                 {
                     RepeatBehavior = RepeatBehavior.Forever,
                     AutoReverse = false
                 };
                 
-                LoadingBar.BeginAnimation(ProgressBar.ValueProperty, animation);
+                LoadingBar.BeginAnimation(Canvas.LeftProperty, animation);
             }
             catch (Exception ex)
             {
@@ -59,7 +59,7 @@ namespace LauncherPhantom.Views
                 StatusMessagesStack.Visibility = Visibility.Visible;
 
                 // Esperar 1 segundo antes de empezar
-                await Task.Delay(1000);
+                await Task.Delay(500);
 
                 // Primer mensaje: Conectando (2 segundos)
                 await Task.Delay(2000);
@@ -73,6 +73,7 @@ namespace LauncherPhantom.Views
                 if (!hasUpdate || versionInfo == null)
                 {
                     Debug.WriteLine("[UpdateCheckSplash] No hay actualización disponible");
+                    await ShowStatusMessageAsync("Ya tienes la última actualización!");
                     await ShowNoUpdateFoundAsync();
                     return;
                 }
@@ -118,7 +119,7 @@ namespace LauncherPhantom.Views
             try
             {
                 // Detener animación de la barra
-                LoadingBar.BeginAnimation(ProgressBar.ValueProperty, null);
+                LoadingBar.BeginAnimation(Canvas.LeftProperty, null);
 
                 // Fade out del loading bar y mensaje
                 var fadeOut = new DoubleAnimation(1.0, 0.0, TimeSpan.FromSeconds(0.3));
@@ -157,7 +158,7 @@ namespace LauncherPhantom.Views
             try
             {
                 // Detener animación de la barra
-                LoadingBar.BeginAnimation(ProgressBar.ValueProperty, null);
+                LoadingBar.BeginAnimation(Canvas.LeftProperty, null);
 
                 // Fade out del loading bar y mensaje
                 var fadeOut = new DoubleAnimation(1.0, 0.0, TimeSpan.FromSeconds(0.3));
@@ -251,7 +252,7 @@ namespace LauncherPhantom.Views
             try
             {                
                 // Guardar error de actualización requerida
-                ConfigManager.Instance.SetSetting("update_required_error", "Se requiere actualización");
+                ConfigManager.Instance.SetSetting("update_required_error", "Actualización requerida");
                 
                 // Navegar a LoginPage sin mostrar MessageBox
                 if (Window.GetWindow(this) is MainWindow mainWindow)

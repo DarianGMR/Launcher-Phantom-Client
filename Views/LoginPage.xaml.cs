@@ -73,7 +73,6 @@ namespace LauncherPhantom.Views
 
         private void UsernameTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            ErrorMessageText.Visibility = Visibility.Collapsed;
             UpdatePlaceholders();
         }
 
@@ -89,7 +88,6 @@ namespace LauncherPhantom.Views
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
-            ErrorMessageText.Visibility = Visibility.Collapsed;
             UpdatePlaceholders();
         }
 
@@ -105,7 +103,6 @@ namespace LauncherPhantom.Views
 
         private void ServerIpTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            ErrorMessageText.Visibility = Visibility.Collapsed;
             UpdatePlaceholders();
         }
 
