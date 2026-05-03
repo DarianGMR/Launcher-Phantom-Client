@@ -73,6 +73,8 @@ namespace LauncherPhantom.Managers
 
         public async Task<string> DownloadUpdateAsync(VersionInfo versionInfo, CancellationToken cancellationToken, Action<int, long, long>? progressCallback)
         {
+            string? filePath = null;
+            
             try
             {
                 Debug.WriteLine("[UPDATE] Descargando actualización...");
@@ -89,7 +91,7 @@ namespace LauncherPhantom.Managers
                 if (string.IsNullOrEmpty(fileName))
                     fileName = "LauncherPhantom.exe";
 
-                var filePath = Path.Combine(updateFolder, fileName);
+                filePath = Path.Combine(updateFolder, fileName);
 
                 // Descargar archivo con soporte para cancelación
                 using (var response = await _httpClient.GetAsync(versionInfo.DownloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
@@ -135,12 +137,42 @@ namespace LauncherPhantom.Managers
             }
             catch (OperationCanceledException)
             {
-                Debug.WriteLine("[UPDATE] Descarga cancelada");
+                Debug.WriteLine("[UPDATE] Descarga cancelada - Eliminando archivo parcial...");
+                
+                // Eliminar el archivo parcialmente descargado
+                if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+                {
+                    try
+                    {
+                        File.Delete(filePath);
+                        Debug.WriteLine($"[UPDATE] Archivo parcial eliminado: {filePath}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[UPDATE] Error eliminando archivo parcial: {ex.Message}");
+                    }
+                }
+                
                 throw;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[UPDATE] Error en DownloadUpdateAsync: {ex.Message}");
+                
+                // Eliminar archivo si hubo error
+                if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+                {
+                    try
+                    {
+                        File.Delete(filePath);
+                        Debug.WriteLine($"[UPDATE] Archivo eliminado por error: {filePath}");
+                    }
+                    catch (Exception deleteEx)
+                    {
+                        Debug.WriteLine($"[UPDATE] Error eliminando archivo: {deleteEx.Message}");
+                    }
+                }
+                
                 throw new Exception($"Error descargando actualización: {ex.Message}");
             }
         }
