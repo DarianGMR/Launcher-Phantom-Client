@@ -28,9 +28,9 @@ namespace LauncherPhantom.Models
         public const int AnimationHoverDuration = 150;
 
         // Timing
-        public const int SplashScreenDuration = 5000;
+        public const int SplashScreenDuration = 3000;
         public const int LoginTimeout = 30000;
         public const int UpdateCheckTimeout = 15000;
-        public const int ConnectionCheckInterval = 30;
+        public const int ConnectionCheckInterval = 10;
     }
 }

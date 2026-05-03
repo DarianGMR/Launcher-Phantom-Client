@@ -149,14 +149,14 @@ namespace LauncherPhantom.Views
                 }
 
                 LoginButton.IsEnabled = false;
-                LoginButton.Content = "Conectando...";
+                LoginButton.Content = "Iniciando sesion...";
 
                 ServerManager.Instance.SetServerUrl(ServerIpTextBox.Text);
 
                 var isConnected = await ServerManager.Instance.TestConnectionAsync();
                 if (!isConnected)
                 {
-                    ShowError("No se puede conectar con el servidor.\nVerifica la dirección IP.");
+                    ShowError("No se puede conectar con el servidor.");
                     LoginButton.IsEnabled = true;
                     LoginButton.Content = "Iniciar Sesión";
                     return;
