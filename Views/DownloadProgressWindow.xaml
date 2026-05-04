@@ -36,7 +36,7 @@
                             Height="35"
                             VerticalAlignment="Center"/>
                     
-                    <!-- Barra de progreso con animación izquierda a derecha -->
+                    <!-- Barra de progreso con animación izquierda a derecha y esquinas redondeadas -->
                     <ProgressBar x:Name="ProgressBar" 
                                  Height="34"
                                  Foreground="#00D9FF"
@@ -50,11 +50,13 @@
                             <ControlTemplate TargetType="ProgressBar">
                                 <Border Background="{TemplateBinding Background}" 
                                         BorderBrush="{TemplateBinding BorderBrush}"
-                                        BorderThickness="{TemplateBinding BorderThickness}">
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="8">
                                     <Grid x:Name="PART_Track" ClipToBounds="True">
                                         <Border x:Name="PART_Indicator" 
                                                 Background="{TemplateBinding Foreground}"
-                                                HorizontalAlignment="Left"/>
+                                                HorizontalAlignment="Left"
+                                                CornerRadius="8"/>
                                     </Grid>
                                 </Border>
                             </ControlTemplate>
