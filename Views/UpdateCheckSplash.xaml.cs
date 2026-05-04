@@ -58,13 +58,13 @@ namespace LauncherPhantom.Views
                 StatusMessageText.Text = "Conectando con el servidor...";
                 StatusMessagesStack.Visibility = Visibility.Visible;
 
-                // Esperar 1 segundo antes de empezar
-                await Task.Delay(500);
+                // Esperar muy poco antes de empezar para que se renderice la UI
+                await Task.Delay(100);
 
-                // Primer mensaje: Conectando (2 segundos)
-                await Task.Delay(2000);
+                // Primer mensaje: Conectando (1.5 segundos)
+                await Task.Delay(1500);
                 
-                // Segundo mensaje: Verificando (2 segundos)
+                // Segundo mensaje: Verificando (1 segundo)
                 await ShowStatusMessageAsync("Verificando si hay actualización disponible...");
 
                 // Verificar actualizaciones
@@ -93,20 +93,20 @@ namespace LauncherPhantom.Views
             try
             {
                 // Fade out del mensaje actual
-                var fadeOut = new DoubleAnimation(1.0, 0.0, TimeSpan.FromSeconds(0.3));
+                var fadeOut = new DoubleAnimation(1.0, 0.0, TimeSpan.FromSeconds(0.2));
                 StatusMessageText.BeginAnimation(UIElement.OpacityProperty, fadeOut);
 
-                await Task.Delay(300);
+                await Task.Delay(200);
 
                 // Cambiar texto y fade in
                 StatusMessageText.Text = message;
                 StatusMessageText.Opacity = 0;
 
-                var fadeIn = new DoubleAnimation(0.0, 1.0, TimeSpan.FromSeconds(0.3));
+                var fadeIn = new DoubleAnimation(0.0, 1.0, TimeSpan.FromSeconds(0.2));
                 StatusMessageText.BeginAnimation(UIElement.OpacityProperty, fadeIn);
 
-                // Esperar 2 segundos de visualización
-                await Task.Delay(2000);
+                // Esperar 1 segundo de visualización
+                await Task.Delay(1000);
             }
             catch (Exception ex)
             {
@@ -122,11 +122,11 @@ namespace LauncherPhantom.Views
                 LoadingBar.BeginAnimation(Canvas.LeftProperty, null);
 
                 // Fade out del loading bar y mensaje
-                var fadeOut = new DoubleAnimation(1.0, 0.0, TimeSpan.FromSeconds(0.3));
+                var fadeOut = new DoubleAnimation(1.0, 0.0, TimeSpan.FromSeconds(0.2));
                 LoadingBarContainer.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 StatusMessagesStack.BeginAnimation(UIElement.OpacityProperty, fadeOut);
 
-                await Task.Delay(300);
+                await Task.Delay(200);
 
                 // Mostrar grid sin actualización
                 LoadingBarContainer.Visibility = Visibility.Collapsed;
@@ -135,11 +135,11 @@ namespace LauncherPhantom.Views
 
                 // Fade in del grid
                 NoUpdateGrid.Opacity = 0;
-                var gridFadeIn = new DoubleAnimation(0.0, 1.0, TimeSpan.FromSeconds(0.5));
+                var gridFadeIn = new DoubleAnimation(0.0, 1.0, TimeSpan.FromSeconds(0.3));
                 NoUpdateGrid.BeginAnimation(UIElement.OpacityProperty, gridFadeIn);
 
-                // Cerrar automáticamente después de 2 segundos
-                await Task.Delay(2000);
+                // Cerrar automáticamente después de 1.5 segundos
+                await Task.Delay(1500);
 
                 // Navegar al dashboard
                 if (Window.GetWindow(this) is MainWindow mainWindow)
@@ -161,11 +161,11 @@ namespace LauncherPhantom.Views
                 LoadingBar.BeginAnimation(Canvas.LeftProperty, null);
 
                 // Fade out del loading bar y mensaje
-                var fadeOut = new DoubleAnimation(1.0, 0.0, TimeSpan.FromSeconds(0.3));
+                var fadeOut = new DoubleAnimation(1.0, 0.0, TimeSpan.FromSeconds(0.2));
                 LoadingBarContainer.BeginAnimation(UIElement.OpacityProperty, fadeOut);
                 StatusMessagesStack.BeginAnimation(UIElement.OpacityProperty, fadeOut);
 
-                await Task.Delay(300);
+                await Task.Delay(200);
 
                 // Mostrar grid de actualización
                 UpdateVersionText.Text = $"v{Constants.AppVersion} → v{versionInfo.Version}";
@@ -177,7 +177,7 @@ namespace LauncherPhantom.Views
 
                 // Fade in del grid
                 UpdateGrid.Opacity = 0;
-                var gridFadeIn = new DoubleAnimation(0.0, 1.0, TimeSpan.FromSeconds(0.5));
+                var gridFadeIn = new DoubleAnimation(0.0, 1.0, TimeSpan.FromSeconds(0.3));
                 UpdateGrid.BeginAnimation(UIElement.OpacityProperty, gridFadeIn);
             }
             catch (Exception ex)
@@ -222,9 +222,12 @@ namespace LauncherPhantom.Views
                 if (!hasUpdate || versionInfo == null)
                 {
                     MessageBox.Show("Error obteniendo información de actualización", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    UpdateButton.IsEnabled = true;
+                    CancelButton.IsEnabled = true;
                     return;
                 }
 
+                // INSTANTÁNEO - Sin delays
                 var downloadWindow = new DownloadProgressWindow();
                 downloadWindow.Owner = Window.GetWindow(this);
                 downloadWindow.ShowDialog();
