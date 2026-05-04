@@ -115,7 +115,7 @@ namespace LauncherPhantom.Managers
                 Debug.WriteLine($"[UPDATE] Descargando desde: {versionInfo.DownloadUrl}");
                 Debug.WriteLine($"[UPDATE] Guardando en: {filePath}");
 
-                // Descargar archivo con soporte para cancelación
+                // Descargar archivo con soporte para cancelación - INSTANTÁNEO
                 response = await _httpClient.GetAsync(versionInfo.DownloadUrl, 
                     HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                 
@@ -127,13 +127,14 @@ namespace LauncherPhantom.Managers
                 Debug.WriteLine($"[UPDATE] Tamaño total: {totalBytes} bytes");
 
                 using (var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken))
-                using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, 65536, true))
+                using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, 131072, true))
                 {
-                    var buffer = new byte[65536]; // Buffer mayor para mejor rendimiento
+                    var buffer = new byte[131072]; // Buffer grande para mejor rendimiento (128KB)
                     var isMoreToRead = true;
                     long totalRead = 0;
                     var lastProgressUpdate = DateTime.Now;
                     var lastProgressBytes = 0L;
+                    var progressUpdateInterval = 250; // Actualizar cada 250ms para precisión en tiempo real
 
                     do
                     {
@@ -149,9 +150,9 @@ namespace LauncherPhantom.Managers
                             await fileStream.WriteAsync(buffer, 0, read, cancellationToken);
                             totalRead += read;
 
-                            // Reportar progreso cada 500ms para mejor precisión
+                            // Reportar progreso en intervalo preciso para UI en tiempo real
                             var now = DateTime.Now;
-                            if (canReportProgress && (now - lastProgressUpdate).TotalMilliseconds >= 500)
+                            if (canReportProgress && (now - lastProgressUpdate).TotalMilliseconds >= progressUpdateInterval)
                             {
                                 var percentage = (int)((totalRead * 100) / totalBytes);
                                 progressCallback?.Invoke(percentage, totalRead, totalBytes);
@@ -163,7 +164,7 @@ namespace LauncherPhantom.Managers
                         }
                     } while (isMoreToRead);
 
-                    // Reporte final
+                    // Reporte final - asegurar 100%
                     if (canReportProgress)
                     {
                         progressCallback?.Invoke(100, totalRead, totalBytes);
