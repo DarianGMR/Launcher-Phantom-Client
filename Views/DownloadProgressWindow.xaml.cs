@@ -16,7 +16,6 @@ namespace LauncherPhantom.Views
         private DateTime _lastSpeedCheckTime;
         private CancellationTokenSource? _cancellationTokenSource;
         private string _downloadedFilePath = "";
-        private System.Windows.Threading.DispatcherTimer? _updateTimer;
         private object _lockObject = new object();
         private bool _cancelRequested = false;
 
@@ -26,15 +25,10 @@ namespace LauncherPhantom.Views
             {
                 InitializeComponent();
                 
-                // Timer para actualizaciones periódicas (500ms)
-                _updateTimer = new System.Windows.Threading.DispatcherTimer();
-                _updateTimer.Interval = TimeSpan.FromMilliseconds(500);
-                _updateTimer.Tick += UpdateTimer_Tick;
-                
-                // Loaded asincrónico para iniciar descarga rápidamente
+                // Loaded asincrónico para iniciar descarga instantáneamente
                 Loaded += async (s, e) => 
                 {
-                    await Task.Delay(50); // Pequeño delay para que la ventana se renderice
+                    // Sin delays, inicio instantáneo
                     await StartDownloadAsync();
                 };
             }
@@ -42,12 +36,6 @@ namespace LauncherPhantom.Views
             {
                 Debug.WriteLine($"[DownloadProgressWindow] Error en constructor: {ex.Message}");
             }
-        }
-
-        private void UpdateTimer_Tick(object? sender, EventArgs e)
-        {
-            // Timer para actualizaciones de UI periódicas
-            // El actual se maneja en el callback de progreso
         }
 
         private async Task StartDownloadAsync()
@@ -75,7 +63,6 @@ namespace LauncherPhantom.Views
                 }
 
                 StatusText.Text = "Conectando con el servidor...";
-                await Task.Delay(100); // Pequeño delay para actualizar UI
 
                 StatusText.Text = "Descargando actualización...";
 
@@ -159,56 +146,65 @@ namespace LauncherPhantom.Views
             {
                 lock (_lockObject)
                 {
-                    // Actualizar barra de progreso
+                    // Actualizar barra de progreso con animación suave
                     ProgressBar.Value = Math.Min(percentage, 100);
                     PercentageText.Text = $"{percentage}%";
 
                     // Convertir a MB con precisión
                     double downloadedMB = downloadedBytes / (1024.0 * 1024.0);
                     double totalMB = totalBytes / (1024.0 * 1024.0);
-                    BytesText.Text = $"{downloadedMB:F2} MB / {totalMB:F2} MB";
+                    BytesText.Text = $"Descargado: {downloadedMB:F2} MB / {totalMB:F2} MB";
 
-                    // Calcular velocidad y tiempo restante cada 500ms
+                    // Calcular velocidad y tiempo restante en tiempo real
                     var now = DateTime.Now;
                     var elapsedSinceLastCheck = (now - _lastSpeedCheckTime).TotalMilliseconds;
                     
-                    if (elapsedSinceLastCheck >= 500) // Actualizar cada 500ms
+                    if (elapsedSinceLastCheck >= 250) // Actualizar cada 250ms para precisión en tiempo real
                     {
                         var bytesDifference = downloadedBytes - _lastBytesDownloaded;
                         var elapsedSeconds = elapsedSinceLastCheck / 1000.0;
                         
                         if (elapsedSeconds > 0)
                         {
-                            // Velocidad en MB/s
-                            var speedMBps = (bytesDifference / elapsedSeconds) / (1024.0 * 1024.0);
-                            SpeedText.Text = $"Velocidad: {speedMBps:F2} MB/s";
+                            // Velocidad en bytes/segundo
+                            double speedBytesPerSecond = bytesDifference / elapsedSeconds;
+                            
+                            // Convertir velocidad a KB/s o MB/s según sea necesario
+                            string speedText;
+                            if (speedBytesPerSecond < 1024 * 1024) // Menos de 1 MB/s
+                            {
+                                // Mostrar en KB/s
+                                double speedKBps = speedBytesPerSecond / 1024.0;
+                                speedText = $"Velocidad: {speedKBps:F0} KB/s";
+                            }
+                            else
+                            {
+                                // Mostrar en MB/s
+                                double speedMBps = speedBytesPerSecond / (1024.0 * 1024.0);
+                                speedText = $"Velocidad: {speedMBps:F2} MB/s";
+                            }
+                            SpeedText.Text = speedText;
 
-                            // Tiempo restante
-                            if (speedMBps > 0)
+                            // Tiempo restante con precisión
+                            if (speedBytesPerSecond > 0)
                             {
                                 var remainingBytes = totalBytes - downloadedBytes;
-                                var remainingSeconds = remainingBytes / (speedMBps * 1024.0 * 1024.0);
+                                var remainingSeconds = remainingBytes / speedBytesPerSecond;
                                 
-                                if (remainingSeconds > 0)
+                                if (remainingSeconds >= 0)
                                 {
                                     var timeSpan = TimeSpan.FromSeconds(remainingSeconds);
                                     TimeRemainingText.Text = $"Tiempo restante: {timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
                                 }
                                 else
                                 {
-                                    TimeRemainingText.Text = "Tiempo restante: --:--";
+                                    TimeRemainingText.Text = "Tiempo restante: 00:00";
                                 }
                             }
 
                             _lastBytesDownloaded = downloadedBytes;
                             _lastSpeedCheckTime = now;
                         }
-                    }
-
-                    // Información adicional
-                    if (totalBytes > 0)
-                    {
-                        ProgressInfoText.Text = $"Progreso: {(double)downloadedBytes / totalBytes * 100:F1}% | Tamaño total: {totalMB:F2} MB";
                     }
 
                     Debug.WriteLine($"[DOWNLOAD] Progreso: {percentage}% ({downloadedMB:F2}MB / {totalMB:F2}MB)");
@@ -292,7 +288,6 @@ namespace LauncherPhantom.Views
                     Debug.WriteLine("[DOWNLOAD] Cierre de ventana bloqueado - Descarga en progreso");
                 }
                 
-                _updateTimer?.Stop();
                 _cancellationTokenSource?.Dispose();
                 
                 Debug.WriteLine("[DOWNLOAD] Ventana cerrada");
