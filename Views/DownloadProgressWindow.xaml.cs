@@ -16,18 +16,38 @@ namespace LauncherPhantom.Views
         private DateTime _lastSpeedCheckTime;
         private CancellationTokenSource? _cancellationTokenSource;
         private string _downloadedFilePath = "";
+        private System.Windows.Threading.DispatcherTimer? _updateTimer;
+        private object _lockObject = new object();
+        private bool _cancelRequested = false;
 
         public DownloadProgressWindow()
         {
             try
             {
                 InitializeComponent();
-                Loaded += async (s, e) => await StartDownloadAsync();
+                
+                // Timer para actualizaciones periódicas (500ms)
+                _updateTimer = new System.Windows.Threading.DispatcherTimer();
+                _updateTimer.Interval = TimeSpan.FromMilliseconds(500);
+                _updateTimer.Tick += UpdateTimer_Tick;
+                
+                // Loaded asincrónico para iniciar descarga rápidamente
+                Loaded += async (s, e) => 
+                {
+                    await Task.Delay(50); // Pequeño delay para que la ventana se renderice
+                    await StartDownloadAsync();
+                };
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[DownloadProgressWindow] Error en constructor: {ex.Message}");
             }
+        }
+
+        private void UpdateTimer_Tick(object? sender, EventArgs e)
+        {
+            // Timer para actualizaciones de UI periódicas
+            // El actual se maneja en el callback de progreso
         }
 
         private async Task StartDownloadAsync()
@@ -37,13 +57,16 @@ namespace LauncherPhantom.Views
                 Debug.WriteLine("[DOWNLOAD] Iniciando descarga...");
                 
                 _isDownloading = true;
+                _cancelRequested = false;
                 _startTime = DateTime.Now;
                 _lastSpeedCheckTime = DateTime.Now;
                 _cancellationTokenSource = new CancellationTokenSource();
                 _downloadedFilePath = "";
                 CancelDownloadButton.IsEnabled = true;
+                CancelDownloadButton.Content = "Cancelar Descarga";
 
                 // Obtener información de versión
+                StatusText.Text = "Obteniendo información de la actualización...";
                 var (hasUpdate, versionInfo) = await UpdateManager.Instance.CheckForUpdatesAsync();
                 if (!hasUpdate || versionInfo == null)
                 {
@@ -51,7 +74,10 @@ namespace LauncherPhantom.Views
                     return;
                 }
 
-                StatusText.Text = "Descargando archivo de actualización...";
+                StatusText.Text = "Conectando con el servidor...";
+                await Task.Delay(100); // Pequeño delay para actualizar UI
+
+                StatusText.Text = "Descargando actualización...";
 
                 // Descargar actualización con soporte para cancelación
                 string filePath = await UpdateManager.Instance.DownloadUpdateAsync(
@@ -59,7 +85,9 @@ namespace LauncherPhantom.Views
                     _cancellationTokenSource.Token,
                     (percentage, downloadedBytes, totalBytes) =>
                     {
-                        Dispatcher.Invoke(() => UpdateProgress(percentage, downloadedBytes, totalBytes));
+                        // Este callback se ejecuta en el thread de la descarga
+                        Dispatcher.Invoke(() => UpdateProgress(percentage, downloadedBytes, totalBytes), 
+                            System.Windows.Threading.DispatcherPriority.Normal);
                     }
                 );
 
@@ -70,8 +98,9 @@ namespace LauncherPhantom.Views
                 _isDownloading = false;
                 ProgressBar.Value = 100;
                 PercentageText.Text = "100%";
-                StatusText.Text = "Descarga completada. Preparando para aplicar actualización...";
+                StatusText.Text = "¡Descarga completada! Preparando actualización...";
                 CancelDownloadButton.IsEnabled = false;
+                CancelDownloadButton.Content = "Cerrando...";
 
                 // Esperar 2 segundos y cerrar
                 await Task.Delay(2000);
@@ -83,6 +112,7 @@ namespace LauncherPhantom.Views
             {
                 Debug.WriteLine("[DOWNLOAD] Descarga cancelada por el usuario");
                 _isDownloading = false;
+                _cancelRequested = false;
                 
                 // Eliminar el archivo descargado parcialmente
                 if (!string.IsNullOrEmpty(_downloadedFilePath) && File.Exists(_downloadedFilePath))
@@ -119,7 +149,7 @@ namespace LauncherPhantom.Views
                     }
                 }
                 
-                ShowError($"Error descargando actualización: {ex.Message}");
+                ShowError($"Error descargando: {ex.Message}");
             }
         }
 
@@ -127,38 +157,62 @@ namespace LauncherPhantom.Views
         {
             try
             {
-                ProgressBar.Value = percentage;
-                PercentageText.Text = $"{percentage}%";
-
-                // Convertir a MB
-                double downloadedMB = downloadedBytes / (1024.0 * 1024.0);
-                double totalMB = totalBytes / (1024.0 * 1024.0);
-                BytesText.Text = $"{downloadedMB:F2} MB / {totalMB:F2} MB";
-
-                // Calcular velocidad
-                var now = DateTime.Now;
-                var elapsed = (now - _lastSpeedCheckTime).TotalSeconds;
-                
-                if (elapsed >= 1) // Actualizar velocidad cada segundo
+                lock (_lockObject)
                 {
-                    var bytesDifference = downloadedBytes - _lastBytesDownloaded;
-                    var speedMBps = (bytesDifference / elapsed) / (1024.0 * 1024.0);
-                    SpeedText.Text = $"Velocidad: {speedMBps:F2} MB/s";
+                    // Actualizar barra de progreso
+                    ProgressBar.Value = Math.Min(percentage, 100);
+                    PercentageText.Text = $"{percentage}%";
 
-                    // Calcular tiempo restante
-                    if (speedMBps > 0)
+                    // Convertir a MB con precisión
+                    double downloadedMB = downloadedBytes / (1024.0 * 1024.0);
+                    double totalMB = totalBytes / (1024.0 * 1024.0);
+                    BytesText.Text = $"{downloadedMB:F2} MB / {totalMB:F2} MB";
+
+                    // Calcular velocidad y tiempo restante cada 500ms
+                    var now = DateTime.Now;
+                    var elapsedSinceLastCheck = (now - _lastSpeedCheckTime).TotalMilliseconds;
+                    
+                    if (elapsedSinceLastCheck >= 500) // Actualizar cada 500ms
                     {
-                        var remainingBytes = totalBytes - downloadedBytes;
-                        var remainingSeconds = remainingBytes / (speedMBps * 1024.0 * 1024.0);
-                        var timeSpan = TimeSpan.FromSeconds(remainingSeconds);
-                        TimeRemainingText.Text = $"Tiempo restante: {timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
+                        var bytesDifference = downloadedBytes - _lastBytesDownloaded;
+                        var elapsedSeconds = elapsedSinceLastCheck / 1000.0;
+                        
+                        if (elapsedSeconds > 0)
+                        {
+                            // Velocidad en MB/s
+                            var speedMBps = (bytesDifference / elapsedSeconds) / (1024.0 * 1024.0);
+                            SpeedText.Text = $"Velocidad: {speedMBps:F2} MB/s";
+
+                            // Tiempo restante
+                            if (speedMBps > 0)
+                            {
+                                var remainingBytes = totalBytes - downloadedBytes;
+                                var remainingSeconds = remainingBytes / (speedMBps * 1024.0 * 1024.0);
+                                
+                                if (remainingSeconds > 0)
+                                {
+                                    var timeSpan = TimeSpan.FromSeconds(remainingSeconds);
+                                    TimeRemainingText.Text = $"Tiempo restante: {timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
+                                }
+                                else
+                                {
+                                    TimeRemainingText.Text = "Tiempo restante: --:--";
+                                }
+                            }
+
+                            _lastBytesDownloaded = downloadedBytes;
+                            _lastSpeedCheckTime = now;
+                        }
                     }
 
-                    _lastBytesDownloaded = downloadedBytes;
-                    _lastSpeedCheckTime = now;
-                }
+                    // Información adicional
+                    if (totalBytes > 0)
+                    {
+                        ProgressInfoText.Text = $"Progreso: {(double)downloadedBytes / totalBytes * 100:F1}% | Tamaño total: {totalMB:F2} MB";
+                    }
 
-                Debug.WriteLine($"[DOWNLOAD] Progreso: {percentage}% ({downloadedMB:F2}MB / {totalMB:F2}MB)");
+                    Debug.WriteLine($"[DOWNLOAD] Progreso: {percentage}% ({downloadedMB:F2}MB / {totalMB:F2}MB)");
+                }
             }
             catch (Exception ex)
             {
@@ -180,6 +234,8 @@ namespace LauncherPhantom.Views
                     (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#1A1F3A")
                 );
                 CancelDownloadButton.IsEnabled = true;
+                CancelDownloadButton.Focusable = true;
+                CancelDownloadButton.Focus();
 
                 Debug.WriteLine($"[DOWNLOAD] Error mostrado: {message}");
             }
@@ -193,16 +249,28 @@ namespace LauncherPhantom.Views
         {
             try
             {
+                // Evitar múltiples clicks
+                if (_cancelRequested)
+                {
+                    Debug.WriteLine("[DOWNLOAD] Cancelación ya solicitada, ignorando click");
+                    return;
+                }
+
+                _cancelRequested = true;
+                CancelDownloadButton.IsEnabled = false;
+
                 if (_isDownloading)
                 {
-                    _cancellationTokenSource?.Cancel();
-                    _isDownloading = false;
+                    Debug.WriteLine("[DOWNLOAD] Cancelación solicitada por usuario");
                     StatusText.Text = "Cancelando descarga...";
-                    CancelDownloadButton.IsEnabled = false;
-                    Debug.WriteLine("[DOWNLOAD] Cancelación solicitada");
+                    CancelDownloadButton.Content = "Cancelando...";
+                    
+                    // Cancelar descarga de forma segura
+                    _cancellationTokenSource?.Cancel();
                 }
                 else
                 {
+                    Debug.WriteLine("[DOWNLOAD] Cerrando ventana");
                     DialogResult = false;
                     Close();
                 }
@@ -217,12 +285,17 @@ namespace LauncherPhantom.Views
         {
             try
             {
-                if (_isDownloading && CancelDownloadButton.IsEnabled)
+                // Permitir cerrar solo si no se está descargando
+                if (_isDownloading && _cancelRequested == false)
                 {
                     e.Cancel = true;
+                    Debug.WriteLine("[DOWNLOAD] Cierre de ventana bloqueado - Descarga en progreso");
                 }
                 
+                _updateTimer?.Stop();
                 _cancellationTokenSource?.Dispose();
+                
+                Debug.WriteLine("[DOWNLOAD] Ventana cerrada");
             }
             catch (Exception ex)
             {

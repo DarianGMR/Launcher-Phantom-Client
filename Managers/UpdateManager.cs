@@ -35,12 +35,20 @@ namespace LauncherPhantom.Managers
 
         private UpdateManager()
         {
-            var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
-            _httpClient = new HttpClient(handler)
+            var handler = new HttpClientHandler
             {
-                Timeout = TimeSpan.FromSeconds(30)
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true,
+                AllowAutoRedirect = true,
+                MaxAutomaticRedirections = 10
             };
+            
+            _httpClient = new HttpClient(handler, true)
+            {
+                Timeout = TimeSpan.FromSeconds(300) // Timeout más largo para descargas grandes
+            };
+            
+            // Headers por defecto
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", "LauncherPhantom/1.0");
         }
 
         public async Task<(bool HasUpdate, VersionInfo? VersionInfo)> CheckForUpdatesAsync()
@@ -74,10 +82,11 @@ namespace LauncherPhantom.Managers
         public async Task<string> DownloadUpdateAsync(VersionInfo versionInfo, CancellationToken cancellationToken, Action<int, long, long>? progressCallback)
         {
             string? filePath = null;
+            HttpResponseMessage? response = null;
             
             try
             {
-                Debug.WriteLine("[UPDATE] Descargando actualización...");
+                Debug.WriteLine("[UPDATE] Iniciando descarga de actualización...");
                 
                 // Crear carpeta de actualización
                 var updateFolder = GetUpdateFolder();
@@ -93,51 +102,86 @@ namespace LauncherPhantom.Managers
 
                 filePath = Path.Combine(updateFolder, fileName);
 
-                // Descargar archivo con soporte para cancelación
-                using (var response = await _httpClient.GetAsync(versionInfo.DownloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
+                // Limpiar archivo anterior si existe
+                if (File.Exists(filePath))
                 {
-                    response.EnsureSuccessStatusCode();
-                    
-                    var totalBytes = response.Content.Headers.ContentLength ?? -1L;
-                    var canReportProgress = totalBytes != -1 && progressCallback != null;
-
-                    using (var contentStream = await response.Content.ReadAsStreamAsync())
-                    using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
+                    try
                     {
-                        var buffer = new byte[8192];
-                        var isMoreToRead = true;
-                        long totalRead = 0;
+                        File.Delete(filePath);
+                    }
+                    catch { /* Ignorar */ }
+                }
 
-                        do
+                Debug.WriteLine($"[UPDATE] Descargando desde: {versionInfo.DownloadUrl}");
+                Debug.WriteLine($"[UPDATE] Guardando en: {filePath}");
+
+                // Descargar archivo con soporte para cancelación
+                response = await _httpClient.GetAsync(versionInfo.DownloadUrl, 
+                    HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+                
+                response.EnsureSuccessStatusCode();
+                
+                var totalBytes = response.Content.Headers.ContentLength ?? -1L;
+                var canReportProgress = totalBytes != -1 && progressCallback != null;
+
+                Debug.WriteLine($"[UPDATE] Tamaño total: {totalBytes} bytes");
+
+                using (var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken))
+                using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, 65536, true))
+                {
+                    var buffer = new byte[65536]; // Buffer mayor para mejor rendimiento
+                    var isMoreToRead = true;
+                    long totalRead = 0;
+                    var lastProgressUpdate = DateTime.Now;
+                    var lastProgressBytes = 0L;
+
+                    do
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        int read = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
+                        if (read == 0)
                         {
-                            cancellationToken.ThrowIfCancellationRequested();
+                            isMoreToRead = false;
+                        }
+                        else
+                        {
+                            await fileStream.WriteAsync(buffer, 0, read, cancellationToken);
+                            totalRead += read;
 
-                            var read = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
-                            if (read == 0)
+                            // Reportar progreso cada 500ms para mejor precisión
+                            var now = DateTime.Now;
+                            if (canReportProgress && (now - lastProgressUpdate).TotalMilliseconds >= 500)
                             {
-                                isMoreToRead = false;
-                            }
-                            else
-                            {
-                                await fileStream.WriteAsync(buffer, 0, read, cancellationToken);
-                                totalRead += read;
+                                var percentage = (int)((totalRead * 100) / totalBytes);
+                                progressCallback?.Invoke(percentage, totalRead, totalBytes);
+                                lastProgressUpdate = now;
+                                lastProgressBytes = totalRead;
 
-                                if (canReportProgress)
-                                {
-                                    var percentage = (int)((totalRead * 100) / totalBytes);
-                                    progressCallback?.Invoke(percentage, totalRead, totalBytes);
-                                }
+                                Debug.WriteLine($"[UPDATE] Progreso: {percentage}% ({totalRead}/{totalBytes} bytes)");
                             }
-                        } while (isMoreToRead);
+                        }
+                    } while (isMoreToRead);
+
+                    // Reporte final
+                    if (canReportProgress)
+                    {
+                        progressCallback?.Invoke(100, totalRead, totalBytes);
                     }
                 }
 
-                Debug.WriteLine($"[UPDATE] Descarga completada: {filePath}");
+                // Verificar integridad del archivo
+                if (!File.Exists(filePath) || new FileInfo(filePath).Length == 0)
+                {
+                    throw new Exception("El archivo descargado está vacío o no existe");
+                }
+
+                Debug.WriteLine($"[UPDATE] Descarga completada exitosamente: {filePath}");
                 return filePath;
             }
             catch (OperationCanceledException)
             {
-                Debug.WriteLine("[UPDATE] Descarga cancelada - Eliminando archivo parcial...");
+                Debug.WriteLine("[UPDATE] Descarga cancelada por el usuario");
                 
                 // Eliminar el archivo parcialmente descargado
                 if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
@@ -158,6 +202,7 @@ namespace LauncherPhantom.Managers
             catch (Exception ex)
             {
                 Debug.WriteLine($"[UPDATE] Error en DownloadUpdateAsync: {ex.Message}");
+                Debug.WriteLine($"[UPDATE] StackTrace: {ex.StackTrace}");
                 
                 // Eliminar archivo si hubo error
                 if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
@@ -173,7 +218,11 @@ namespace LauncherPhantom.Managers
                     }
                 }
                 
-                throw new Exception($"Error descargando actualización: {ex.Message}");
+                throw new Exception($"Error descargando actualización: {ex.Message}", ex);
+            }
+            finally
+            {
+                response?.Dispose();
             }
         }
 
@@ -227,7 +276,7 @@ namespace LauncherPhantom.Managers
                         try
                         {
                             File.Delete(file);
-                            Debug.WriteLine($"[UPDATE] Archivo eliminado: {file}");
+                            Debug.WriteLine($"[UPDATE] Archivo limpiado: {file}");
                         }
                         catch (Exception ex)
                         {
