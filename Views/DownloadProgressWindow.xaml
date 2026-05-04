@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Descargando Actualización"
-        Width="650"
-        Height="380"
+        Width="440"
+        Height="290"
         WindowStartupLocation="CenterOwner"
         Background="#0A0E27"
         Foreground="#FFFFFF"
@@ -15,28 +15,30 @@
         Topmost="True">
     
     <Border Background="#0A0E27" CornerRadius="12" BorderBrush="#00D9FF" BorderThickness="2">
-        <Grid Margin="40,35,40,35">
+        <Grid Margin="20,15,20,15">
             <StackPanel VerticalAlignment="Stretch">
                 <!-- Título -->
                 <TextBlock Text="Descargando Actualización" 
                            FontSize="22" 
                            FontWeight="Bold"
                            Foreground="#00D9FF"
-                           Margin="0,0,0,30"/>
+                           TextAlignment="Center"
+                           VerticalAlignment="Center"
+                           Margin="0,0,0,15"/>
 
-                <!-- Contenedor de Barra de Progreso con Porcentaje Superpuesto -->
-                <Grid Margin="0,0,0,20" Height="60">
+                <!-- Contenedor de Barra de Progreso -->
+                <Grid Margin="0,0,0,6" Height="45">
                     <!-- Fondo de la barra -->
                     <Border Background="#1A1F3A" 
-                            CornerRadius="8"
                             BorderBrush="#00D9FF"
+                            CornerRadius="8"
                             BorderThickness="1.5"
-                            Height="50"
+                            Height="35"
                             VerticalAlignment="Center"/>
                     
-                    <!-- Barra de progreso actual -->
+                    <!-- Barra de progreso con animación izquierda a derecha -->
                     <ProgressBar x:Name="ProgressBar" 
-                                 Height="50"
+                                 Height="34"
                                  Foreground="#00D9FF"
                                  Background="Transparent"
                                  Margin="0"
@@ -51,18 +53,19 @@
                                         BorderThickness="{TemplateBinding BorderThickness}">
                                     <Grid x:Name="PART_Track" ClipToBounds="True">
                                         <Border x:Name="PART_Indicator" 
-                                                Background="{TemplateBinding Foreground}"/>
+                                                Background="{TemplateBinding Foreground}"
+                                                HorizontalAlignment="Left"/>
                                     </Grid>
                                 </Border>
                             </ControlTemplate>
                         </ProgressBar.Template>
                     </ProgressBar>
                     
-                    <!-- Porcentaje SOBRE la barra (Centro) -->
+                    <!-- Porcentaje sobre la barra (Centro) -->
                     <TextBlock x:Name="PercentageText" 
                                Text="0%" 
                                Foreground="#FFFFFF" 
-                               FontSize="18"
+                               FontSize="17"
                                FontWeight="Bold"
                                TextAlignment="Center"
                                VerticalAlignment="Center"
@@ -70,53 +73,36 @@
                 </Grid>
 
                 <!-- Información de Descarga -->
-                <Grid Margin="0,0,0,20">
+                <Grid Margin="0,0,0,5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
                     
-                    <!-- Bytes descargados -->
+                    <!-- Bytes descargados (Fila 0) -->
                     <TextBlock x:Name="BytesText" 
-                               Text="0.00 MB / 0.00 MB" 
+                               Text="Descargado: 0.00 MB / 0.00 MB" 
                                Foreground="#A0A0A0" 
-                               FontSize="13"
+                               FontSize="16"
                                Grid.Row="0"
-                               Grid.Column="0"
-                               Margin="0,0,10,3"/>
-                    
-                    <!-- Velocidad -->
-                    <TextBlock x:Name="SpeedText" 
-                               Text="Velocidad: 0.00 MB/s" 
-                               Foreground="#A0A0A0" 
-                               FontSize="13"
-                               Grid.Row="0"
-                               Grid.Column="1"
-                               TextAlignment="Right"
-                               Margin="10,0,0,3"/>
-                    
-                    <!-- Tiempo restante -->
-                    <TextBlock x:Name="TimeRemainingText" 
-                               Text="Tiempo restante: --:--" 
-                               Foreground="#A0A0A0" 
-                               FontSize="13"
-                               Grid.Row="1"
-                               Grid.ColumnSpan="2"
                                Margin="0,0,0,3"/>
                     
-                    <!-- Información adicional -->
-                    <TextBlock x:Name="ProgressInfoText" 
-                               Text="" 
-                               Foreground="#B0B0B0" 
-                               FontSize="11"
+                    <!-- Velocidad de descarga (Fila 1) -->
+                    <TextBlock x:Name="SpeedText" 
+                               Text="Velocidad: 0.00 KB/s" 
+                               Foreground="#A0A0A0" 
+                               FontSize="16"
+                               Grid.Row="1"
+                               Margin="0,0,0,3"/>
+                    
+                    <!-- Tiempo restante (Fila 2) -->
+                    <TextBlock x:Name="TimeRemainingText" 
+                               Text="Tiempo restante: 00:00" 
+                               Foreground="#A0A0A0" 
+                               FontSize="16"
                                Grid.Row="2"
-                               Grid.ColumnSpan="2"
-                               FontStyle="Italic"/>
+                               Margin="0,0,0,3"/>
                 </Grid>
 
                 <!-- Estado -->
@@ -126,23 +112,23 @@
                            FontSize="13"
                            TextAlignment="Center"
                            TextWrapping="Wrap"
-                           Margin="0,0,0,20"
+                           Margin="0,0,0,5"
                            MinHeight="26"/>
 
-                <!-- Botón Cancelar - Con mejor responsividad -->
+                <!-- Botón Cancelar -->
                 <Button x:Name="CancelDownloadButton" 
                         Content="Cancelar Descarga" 
                         Background="#FF3333"
                         Foreground="#FFFFFF"
-                        Padding="30,15"
+                        Padding="20,10"
                         FontSize="14"
                         FontWeight="Bold"
                         Cursor="Hand"
                         Click="CancelDownloadButton_Click"
                         BorderThickness="0"
                         HorizontalAlignment="Center"
-                        Width="220"
-                        Height="50"
+                        Width="190"
+                        Height="45"
                         Focusable="True">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
@@ -162,7 +148,7 @@
                                     <Setter TargetName="border" Property="BorderBrush" Value="#FFAAAA"/>
                                 </Trigger>
                                 <Trigger Property="IsPressed" Value="True">
-                                    <Setter TargetName="border" Property="Background" Value="#CC0000"/>
+                                    <Setter TargetName="border" Property="Background" Value="#5F0000"/>
                                     <Setter TargetName="border" Property="BorderBrush" Value="#FF0000"/>
                                 </Trigger>
                                 <Trigger Property="IsEnabled" Value="False">
