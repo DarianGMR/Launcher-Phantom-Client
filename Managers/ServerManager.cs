@@ -112,7 +112,7 @@ namespace LauncherPhantom.Managers
         {
             try
             {
-                Debug.WriteLine("[SERVER] Obteniendo versión desde update.json...");
+                Debug.WriteLine("[SERVER] Leyendo información de actualización desde /api/launcher/version (update.json)");
                 
                 var response = await _httpClient.GetAsync($"{_serverUrl}/api/launcher/version");
                 var content = await response.Content.ReadAsStringAsync();
@@ -147,22 +147,22 @@ namespace LauncherPhantom.Managers
                             }
                         }
 
-                        Debug.WriteLine($"[SERVER] Versión obtenida: {versionInfo.Version}");
+                        Debug.WriteLine($"[SERVER] ✓ Versión obtenida: {versionInfo.Version}");
                         return versionInfo;
                     }
                     catch (JsonException)
                     {
-                        Debug.WriteLine($"[SERVER] Error parseando JSON");
+                        Debug.WriteLine($"[SERVER] ✗ Error parseando JSON");
                         return null;
                     }
                 }
                 
-                Debug.WriteLine($"[SERVER] Error obteniendo versión: {response.StatusCode}");
+                Debug.WriteLine($"[SERVER] ✗ Error obteniendo versión: {response.StatusCode}");
                 return null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Debug.WriteLine($"[SERVER] Error en GetVersionAsync");
+                Debug.WriteLine($"[SERVER] ✗ Error en GetVersionAsync: {ex.Message}");
                 return null;
             }
         }
@@ -197,9 +197,9 @@ namespace LauncherPhantom.Managers
 
                 return downloadPath;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Debug.WriteLine($"[SERVER] Error descargando archivo");
+                Debug.WriteLine($"[SERVER] ✗ Error descargando archivo: {ex.Message}");
                 throw;
             }
         }
@@ -221,19 +221,19 @@ namespace LauncherPhantom.Managers
                     {
                         await connectionCheck();
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        Debug.WriteLine($"[SERVER] Error verificando conexión");
+                        Debug.WriteLine($"[SERVER] ✗ Error verificando conexión: {ex.Message}");
                     }
                 };
                 _connectionCheckTimer.AutoReset = true;
                 _connectionCheckTimer.Start();
                 
-                Debug.WriteLine($"[SERVER] Monitoreo iniciado");
+                Debug.WriteLine($"[SERVER] Monitoreo de conexión iniciado");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Debug.WriteLine($"[SERVER] Error iniciando monitoreo");
+                Debug.WriteLine($"[SERVER] ✗ Error iniciando monitoreo: {ex.Message}");
             }
         }
 
@@ -246,12 +246,12 @@ namespace LauncherPhantom.Managers
                     _connectionCheckTimer.Stop();
                     _connectionCheckTimer.Dispose();
                     _connectionCheckTimer = null;
-                    Debug.WriteLine("[SERVER] Monitoreo detenido");
+                    Debug.WriteLine("[SERVER] Monitoreo de conexión detenido");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Debug.WriteLine($"[SERVER] Error deteniendo monitoreo");
+                Debug.WriteLine($"[SERVER] ✗ Error deteniendo monitoreo: {ex.Message}");
             }
         }
     }
