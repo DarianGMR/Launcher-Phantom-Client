@@ -154,10 +154,6 @@ click.wav - Sonido al hacer clic
 success.wav - Sonido de éxito
 error.wav - Sonido de error
 
-## ⌨️ Atajos de Teclado
-Enter - Enviar formulario (Login/Register)
-Escape - Cerrar ventanas de diálogo
-
 ## 🐛 Debugging
 Habilita el modo debug en config.json:
 ```bash
