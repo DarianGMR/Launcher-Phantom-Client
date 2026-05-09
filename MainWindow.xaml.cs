@@ -15,8 +15,8 @@ namespace LauncherPhantom
         private RotateTransform? _spinnerRotate;
         private const int LoginWidth = 640;
         private const int LoginHeight = 480;
-        private const int DashboardWidth = 840;
-        private const int DashboardHeight = 580;
+        private const int DashboardWidth = 1220;
+        private const int DashboardHeight = 700;
 
         public MainWindow()
         {

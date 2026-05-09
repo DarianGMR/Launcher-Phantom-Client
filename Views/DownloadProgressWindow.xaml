@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Descargando Actualización"
         Width="440"
-        Height="290"
+        Height="285"
         WindowStartupLocation="CenterOwner"
         Background="#0A0E27"
         Foreground="#FFFFFF"
@@ -24,7 +24,7 @@
                            Foreground="#00D9FF"
                            TextAlignment="Center"
                            VerticalAlignment="Center"
-                           Margin="0,0,0,15"/>
+                           Margin="0,0,0,10"/>
 
                 <!-- Contenedor de Barra de Progreso -->
                 <Grid Margin="0,0,0,6" Height="45">

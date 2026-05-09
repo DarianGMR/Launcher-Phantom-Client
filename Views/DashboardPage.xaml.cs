@@ -105,7 +105,7 @@ namespace LauncherPhantom.Views
                 
                 Debug.WriteLine("[DashboardPage] Guardando error de conexión...");
                 // Guardar el estado de error para mostrarlo en LoginPage
-                ConfigManager.Instance.SetSetting("connection_error", "CONEXIÓN PERDIDA\n\nLa conexión con el servidor se ha interrumpido.");
+                ConfigManager.Instance.SetSetting("connection_error", "Se a perdido la conexion con el servidor.");
                 
                 // Usar Dispatcher para navegar (asegura que se ejecute en el thread principal)
                 await Dispatcher.InvokeAsync(() =>
@@ -164,7 +164,7 @@ namespace LauncherPhantom.Views
                 StopConnectionMonitoring();
                 
                 Debug.WriteLine("[DashboardPage] Iniciando monitoreo de conexión (intervalo: 5s)");
-                // Verificar conexión cada 5 segundos (en lugar de 3)
+                // Verificar conexión cada 5 segundos
                 _connectionTimer = new System.Timers.Timer(5000);
                 _connectionTimer.Elapsed += (s, e) =>
                 {
