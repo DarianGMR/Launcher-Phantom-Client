@@ -1,0 +1,91 @@
+<Page x:Class="LauncherPhantom.Views.CatalogoPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="clr-namespace:LauncherPhantom.Converters"
+      Title="Catálogo" Background="#0A0E27" Foreground="#FFFFFF">
+    
+    <Page.Resources>
+        <local:ImageSourceConverter x:Key="ImageSourceConverter"/>
+    </Page.Resources>
+    
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Games Grid -->
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Text="🎮 CATÁLOGO DE JUEGOS" FontSize="26" Foreground="#00D9FF" FontWeight="Bold" Margin="0,0,0,30" TextAlignment="Center"/>
+                
+                <ItemsControl x:Name="GamesCatalog">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border x:Name="CardBorder" Background="#1A1F3A" Margin="15" Width="220" Height="300" Cursor="Hand">
+                                <Border.Effect>
+                                    <DropShadowEffect x:Name="CardShadow" BlurRadius="10" ShadowDepth="2" Opacity="0.3" Color="#00D9FF"/>
+                                </Border.Effect>
+                                <Border.RenderTransform>
+                                    <ScaleTransform x:Name="CardScale" ScaleX="1" ScaleY="1" CenterX="110" CenterY="150"/>
+                                </Border.RenderTransform>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="45"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <!-- Imagen - Rellena completamente el espacio -->
+                                    <Image Grid.Row="0" Source="{Binding ImageUrl, Converter={StaticResource ImageSourceConverter}}" Stretch="Fill"/>
+                                    
+                                    <!-- Nombre del juego -->
+                                    <TextBlock Grid.Row="1" Text="{Binding Name}" Foreground="#FFFFFF" FontSize="16" FontWeight="Bold" Margin="8,0,8,0" TextWrapping="Wrap" TextAlignment="Center" MaxHeight="25"/>
+                                    
+                                    <!-- Descripción -->
+                                    <TextBlock Grid.Row="2" Text="{Binding Description}" Foreground="#A0A0A0" FontSize="12" Margin="8,0,8,3" TextWrapping="Wrap" TextAlignment="Center" MaxHeight="21"/>
+                                    
+                                    <!-- Botón Descargar -->
+                                    <Button Grid.Row="3" Content="📥 DESCARGAR" Background="#00D9FF" Foreground="#000000" Margin="8,0,8,8" FontSize="10" FontWeight="Bold" Cursor="Hand" Click="Download_Click"/>
+                                </Grid>
+                                <Border.Triggers>
+                                    <EventTrigger RoutedEvent="MouseEnter">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="CardScale" Storyboard.TargetProperty="ScaleX" From="1" To="1.08" Duration="0:0:0.3"/>
+                                                <DoubleAnimation Storyboard.TargetName="CardScale" Storyboard.TargetProperty="ScaleY" From="1" To="1.08" Duration="0:0:0.3"/>
+                                                <DoubleAnimation Storyboard.TargetName="CardShadow" Storyboard.TargetProperty="BlurRadius" From="10" To="20" Duration="0:0:0.3"/>
+                                                <DoubleAnimation Storyboard.TargetName="CardShadow" Storyboard.TargetProperty="Opacity" From="0.3" To="0.6" Duration="0:0:0.3"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                    <EventTrigger RoutedEvent="MouseLeave">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="CardScale" Storyboard.TargetProperty="ScaleX" From="1.08" To="1" Duration="0:0:0.3"/>
+                                                <DoubleAnimation Storyboard.TargetName="CardScale" Storyboard.TargetProperty="ScaleY" From="1.08" To="1" Duration="0:0:0.3"/>
+                                                <DoubleAnimation Storyboard.TargetName="CardShadow" Storyboard.TargetProperty="BlurRadius" From="20" To="10" Duration="0:0:0.3"/>
+                                                <DoubleAnimation Storyboard.TargetName="CardShadow" Storyboard.TargetProperty="Opacity" From="0.6" To="0.3" Duration="0:0:0.3"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Border.Triggers>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                
+                <!-- Empty State -->
+                <StackPanel x:Name="EmptyState" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,100,0,0">
+                    <TextBlock Text="Cargando juegos disponibles..." Foreground="#A0A0A0" FontSize="20" TextAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+
+</Page>

@@ -1,0 +1,68 @@
+<Page x:Class="LauncherPhantom.Views.CreditsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Créditos" Background="#0A0E27" Foreground="#FFFFFF">
+    
+    <ScrollViewer>
+        <StackPanel Margin="30" MaxWidth="600" HorizontalAlignment="Center">
+            <TextBlock Text="⭐ CRÉDITOS" FontSize="28" Foreground="#00D9FF" FontWeight="Bold" TextAlignment="Center" Margin="0,20,0,40"/>
+            
+            <!-- App Info -->
+            <Border Background="#1A1F3A" Padding="20" Margin="0,0,0,20">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="12" ShadowDepth="0" Opacity="0.3" Color="#00D9FF"/>
+                </Border.Effect>
+                <StackPanel>
+                    <TextBlock Text="LAUNCHER PHANTOM" Foreground="#00D9FF" FontSize="16" FontWeight="Bold"/>
+                    <TextBlock Text="Creador: DarianGMR" Foreground="#A0A0A0" FontSize="12" Margin="0,2,0,0"/>
+                    <TextBlock Text="Versión: 0.2.0" Foreground="#A0A0A0" FontSize="12" Margin="0,5,0,0"/>
+                    <TextBlock Text="Plataforma: Windows" Foreground="#A0A0A0" FontSize="12" Margin="0,2,0,0"/>
+                    <TextBlock Text="Estado: En Desarrollo Activo" Foreground="#A0A0A0" FontSize="12" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- Developers -->
+            <TextBlock Text="👨‍💻 DESARROLLADORES" Foreground="#00D9FF" FontSize="14" FontWeight="Bold" Margin="0,0,0,10"/>
+            <Border Background="#1A1F3A" Padding="20" Margin="0,0,0,20">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="12" ShadowDepth="0" Opacity="0.3" Color="#00D9FF"/>
+                </Border.Effect>
+                <StackPanel>
+                    <TextBlock Text="• DarianGMR - Desarollador Principal" Foreground="#FFFFFF" FontSize="12" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- Technologies -->
+            <TextBlock Text="🔧 TECNOLOGÍAS" Foreground="#00D9FF" FontSize="14" FontWeight="Bold" Margin="0,0,0,10"/>
+            <Border Background="#1A1F3A" Padding="20" Margin="0,0,0,20">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="12" ShadowDepth="0" Opacity="0.3" Color="#00D9FF"/>
+                </Border.Effect>
+                <StackPanel>
+                    <TextBlock Text="Frontend: WPF (Windows Presentation Foundation)" Foreground="#FFFFFF" FontSize="12" Margin="0,5,0,0"/>
+                    <TextBlock Text="Backend: ASP.NET Core 8.0" Foreground="#FFFFFF" FontSize="12" Margin="0,5,0,0"/>
+                    <TextBlock Text="Database: SQLite" Foreground="#FFFFFF" FontSize="12" Margin="0,5,0,0"/>
+                    <TextBlock Text="Auth: JWT (JSON Web Tokens)" Foreground="#FFFFFF" FontSize="12" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- Features -->
+            <TextBlock Text="✨ CARACTERÍSTICAS" Foreground="#00D9FF" FontSize="14" FontWeight="Bold" Margin="0,0,0,10"/>
+            <Border Background="#1A1F3A" Padding="20" Margin="0,0,0,20">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="12" ShadowDepth="0" Opacity="0.3" Color="#00D9FF"/>
+                </Border.Effect>
+                <StackPanel>
+                    <TextBlock Text="• Sistema de autenticación seguro con JWT" Foreground="#FFFFFF" FontSize="12" Margin="0,5,0,0"/>
+                    <TextBlock Text="• Interfaz moderna, fluida y con animaciones" Foreground="#FFFFFF" FontSize="12" Margin="0,5,0,0"/>
+                    <TextBlock Text="• Monitoreo de conexión en tiempo real" Foreground="#FFFFFF" FontSize="12" Margin="0,5,0,0"/>
+                    <TextBlock Text="• Sistema de noticias integrado" Foreground="#FFFFFF" FontSize="12" Margin="0,5,0,0"/>
+                    <TextBlock Text="• Dashboard rediseñado con efectos visuales" Foreground="#FFFFFF" FontSize="12" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Border>
+            
+            <TextBlock Text="© 2026 Launcher Phantom. Todos los derechos reservados." 
+                       Foreground="#A0A0A0" FontSize="17" TextAlignment="Center" Margin="0,20,0,20"/>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

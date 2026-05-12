@@ -1,0 +1,63 @@
+<Page x:Class="LauncherPhantom.Views.NoticiasPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Noticias" Background="#0A0E27" Foreground="#FFFFFF">
+    
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <TextBlock Grid.Row="0" Text="📰 ÚLTIMAS NOTICIAS" FontSize="26" Foreground="#00D9FF" FontWeight="Bold" Margin="0,0,0,30" TextAlignment="Center"/>
+        
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel x:Name="NewsList">
+                <!-- News Item 1 -->
+                <Border Background="#1A1F3A" Padding="20" Margin="0,0,0,15" MaxWidth="700">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="12" ShadowDepth="1" Opacity="0.3" Color="#00D9FF"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="[05-05-2026]" Foreground="#00D9FF" FontSize="11" FontWeight="Bold"/>
+                            <TextBlock Text="Actualización del Launcher v0.2.0" Foreground="#FFFFFF" FontSize="13" FontWeight="Bold" Margin="10,0,0,0"/>
+                        </StackPanel>
+                        <TextBlock Text="Se ha liberado una nueva versión del launcher con nuevo dashboard rediseñado con todo el contenido, BIBLIOTECA: En desarollo, CATALOGO DE JUEGOS: En desarrollo, WEB: Completo, NOTICIAS: Completo, CREDITOS: Completo, PERFIL: En desarrollo. Toda la UI del dashboard esta echa con animaciones fluidas y multiples funciones." 
+                                   Foreground="#A0A0A0" FontSize="12" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+                
+                <!-- News Item 2 -->
+                <Border Background="#1A1F3A" Padding="20" Margin="0,0,0,15" MaxWidth="700">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="12" ShadowDepth="1" Opacity="0.3" Color="#00D9FF"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="[03-05-2026]" Foreground="#00D9FF" FontSize="11" FontWeight="Bold"/>
+                            <TextBlock Text="Actualización del Launcher v0.1.1" Foreground="#FFFFFF" FontSize="13" FontWeight="Bold" Margin="10,0,0,0"/>
+                        </StackPanel>
+                        <TextBlock Text="Se a mejorado toda la interfaz visual del launcher, haciendolo mas moderno con animaciones y juegos de colores haciendolo mas intuitivo y bonito." 
+                                   Foreground="#A0A0A0" FontSize="12" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+                
+                <!-- News Item 3 -->
+                <Border Background="#1A1F3A" Padding="20" Margin="0,0,0,15" MaxWidth="700">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="12" ShadowDepth="1" Opacity="0.3" Color="#00D9FF"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="[01-05-2026]" Foreground="#00D9FF" FontSize="11" FontWeight="Bold"/>
+                            <TextBlock Text="Creacion del Launcher v0.1.0" Foreground="#FFFFFF" FontSize="13" FontWeight="Bold" Margin="10,0,0,0"/>
+                        </StackPanel>
+                        <TextBlock Text="El launcher tiene todo lo basico, conexion con launcher server, registro y inicio de sesion, seguridad con jwt, validaciones, verificacion de actualizacion y un dashboard visual." 
+                                   Foreground="#A0A0A0" FontSize="12" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

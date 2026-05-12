@@ -40,7 +40,7 @@
                            Margin="0,0,0,20"/>
                 
                 <!-- Version -->
-                <TextBlock Text="v0.1 - FASE INICIAL" 
+                <TextBlock Text="v0.1.0 - FASE INICIAL" 
                            Foreground="#7B2CBF" 
                            FontSize="11"
                            TextAlignment="Center"
