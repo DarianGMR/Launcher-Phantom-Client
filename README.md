@@ -1,4 +1,4 @@
-# 🚀 Launcher Phantom v0.1
+# 🚀 Launcher Phantom v0.2.0
 
 Launcher de juegos cliente desarrollado en C# .NET con interfaz WPF moderna.
 
@@ -29,7 +29,7 @@ dotnet run
 dotnet build -c Release
 ```
 
-## 🎨 Características - Phase 1 (Auth)
+## 🎨 Características
 ✅ Splash Screen
 
 Animación de carga (5 segundos máximo)
@@ -66,7 +66,6 @@ Retry automático
 Verificación de versión servidor
 Diálogo de actualización disponible
 Descarga con barra de progreso
-Aplicación de actualización
 
 ✅ Audio
 
@@ -78,67 +77,6 @@ Reproducción asíncrona
 Encriptación DPAPI de datos sensibles
 Base de datos SQLite
 Configuración JSON
-
-## 🌐 Configuración del Servidor
-El servidor Launcher debe proporcionar estos endpoints:
-```bash
-POST /api/auth/login
-JSON
-Request:
-{
-  "username": "usuario",
-  "password": "contraseña"
-}
-
-Response (Success):
-{
-  "success": true,
-  "token": "jwt_token",
-  "user": {
-    "id": "123",
-    "username": "usuario",
-    "Email": "user@example.com"
-  }
-}
-
-Response (Error):
-{
-  "success": false,
-  "error": "Usuario o contraseña incorrectos"
-}
-POST /api/auth/register
-JSON
-Request:
-{
-  "username": "usuario",
-  "Email": "user@Email.com",
-  "password": "contraseña"
-}
-
-Response (Success):
-{
-  "success": true,
-  "message": "Cuenta creada exitosamente",
-  "userId": "123"
-}
-
-Response (Error):
-{
-  "success": false,
-  "error": "El usuario ya existe"
-}
-GET /api/launcher/version
-JSON
-Response:
-{
-  "version": "0.2.0",
-  "downloadUrl": "https://..../launcher-update.exe",
-  "changes": "- Nueva función\n- Bug fixes",
-  "required": false
-}
-GET /health
-Response: 200 OK
-```
 
 ## 🔐 Encriptación
 Los datos sensibles (contraseñas, tokens JWT) se encriptan usando DPAPI de Windows:
@@ -154,10 +92,6 @@ click.wav - Sonido al hacer clic
 success.wav - Sonido de éxito
 error.wav - Sonido de error
 
-## ⌨️ Atajos de Teclado
-Enter - Enviar formulario (Login/Register)
-Escape - Cerrar ventanas de diálogo
-
 ## 🐛 Debugging
 Habilita el modo debug en config.json:
 ```bash
@@ -168,18 +102,12 @@ JSON
 ```
 Ver logs en %APPDATA%\Phantom\launcher.db tabla Logs.
 
-## 🚀 Próximas Fases
-Phase 2: Dashboard y gestión de juegos
-Phase 3: Descarga y ejecución de juegos
-Phase 4: Sistema de mods
-Phase 5: Social features (chat, amigos)
-
 ## 📝 Licencia
 Privado - DarianGMR
 
 ## 👤 Autor
 DarianGMR
-Versión: 0.1.0 Última actualización: 2026-05-1
+Versión: 0.2.0 Última actualización: 2026-05-11
 
 ---
 
