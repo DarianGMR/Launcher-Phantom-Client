@@ -38,8 +38,6 @@ namespace LauncherPhantom.Views
         {
             try
             {
-                Debug.WriteLine("[ProfilePage] Logout iniciado");
-                
                 ConfigManager.Instance.DeleteSetting("jwt_token");
                 ConfigManager.Instance.DeleteSetting("current_username");
                 ConfigManager.Instance.DeleteSetting("connection_error");

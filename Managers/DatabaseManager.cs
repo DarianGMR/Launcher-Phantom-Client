@@ -48,14 +48,9 @@ namespace LauncherPhantom.Managers
                 }
 
                 var dbPath = Path.Combine(appDataPath, "launcher.db");
-                _connectionString = $"Data Source={dbPath};Version=3;";
-
-                Debug.WriteLine($"[DatabaseManager] Conectando a: {dbPath}");
-                
+                _connectionString = $"Data Source={dbPath};Version=3;";                
                 _connection = new SQLiteConnection(_connectionString);
                 _connection.Open();
-
-                Debug.WriteLine("[DatabaseManager] Conexión abierta correctamente");
 
                 CreateTables();
                 

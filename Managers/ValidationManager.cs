@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using System.Diagnostics;
 
 namespace LauncherPhantom.Managers
 {
@@ -53,7 +52,6 @@ namespace LauncherPhantom.Managers
             if (Regex.IsMatch(password, "[0-9]")) strength++;
             if (Regex.IsMatch(password, "[^a-zA-Z0-9]")) strength++;
 
-            Debug.WriteLine($"[ValidationManager] Fortaleza de contraseña: {strength}/5");
             return strength;
         }
     }

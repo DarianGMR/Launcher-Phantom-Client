@@ -60,7 +60,6 @@ namespace LauncherPhantom.Managers
 
             // Construir URL con puerto predeterminado
             var serverUrl = $"http://{ip}:{DEFAULT_PORT}";
-            Debug.WriteLine($"[AuthManager] URL construida: {serverUrl}");
             return serverUrl;
         }
 
@@ -79,8 +78,7 @@ namespace LauncherPhantom.Managers
                 var response = await _httpClient.PostAsync(endpoint, content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
-                Debug.WriteLine($"[AuthManager] Respuesta status: {response.StatusCode}");
-                Debug.WriteLine($"[AuthManager] Respuesta contenido: {responseContent}");
+                Debug.WriteLine($"[AuthManager] Respuesta: {response.StatusCode}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -131,7 +129,6 @@ namespace LauncherPhantom.Managers
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 Debug.WriteLine($"[AuthManager] Respuesta status: {response.StatusCode}");
-                Debug.WriteLine($"[AuthManager] Respuesta contenido: {responseContent}");
 
                 return JsonConvert.DeserializeObject<AuthResponse>(responseContent) 
                     ?? new AuthResponse { Success = false, Error = "Error desconocido" };

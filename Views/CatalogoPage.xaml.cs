@@ -4,7 +4,6 @@ using System.Windows.Controls;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using LauncherPhantom.Managers;
 
 namespace LauncherPhantom.Views
 {

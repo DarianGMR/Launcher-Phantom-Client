@@ -170,7 +170,6 @@ namespace LauncherPhantom.Views
 
             try
             {
-                Debug.WriteLine("[RegisterPage] Probando conexión con servidor...");
                 ServerManager.Instance.SetServerUrl(ServerIpTextBox.Text);
                 
                 bool canConnect = await ServerManager.Instance.TestConnectionAsync();
@@ -250,6 +249,7 @@ namespace LauncherPhantom.Views
                 if (mainWindow != null)
                 {
                     mainWindow.NavigateTo(new LoginPage());
+                    Debug.WriteLine($"[RegisterPage] Navegando a LoginPage...");
                 }
             }
             catch (Exception ex)

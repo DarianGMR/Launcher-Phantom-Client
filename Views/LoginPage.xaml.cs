@@ -2,7 +2,6 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using LauncherPhantom.Managers;
 using LauncherPhantom.Models;
 
@@ -24,7 +23,7 @@ namespace LauncherPhantom.Views
                 var updateRequiredError = ConfigManager.Instance.GetSetting("update_required_error");
                 if (!string.IsNullOrEmpty(updateRequiredError))
                 {
-                    Debug.WriteLine($"[LoginPage] Error de actualización detectado: {updateRequiredError}");
+                    Debug.WriteLine($"[LoginPage] Error: {updateRequiredError}");
                     ShowError(updateRequiredError);
                     ConfigManager.Instance.DeleteSetting("update_required_error");
                 }
@@ -238,6 +237,7 @@ namespace LauncherPhantom.Views
             if (Window.GetWindow(this) is MainWindow mainWindow)
             {
                 mainWindow.NavigateTo(new RegisterPage());
+                Debug.WriteLine($"[LoginPage] Navegando a RegisterPage...");
             }
         }
     }

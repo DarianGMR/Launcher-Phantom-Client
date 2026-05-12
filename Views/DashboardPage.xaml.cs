@@ -6,7 +6,6 @@ using System.Windows.Media.Animation;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using LauncherPhantom.Managers;
-using LauncherPhantom.Models;
 
 namespace LauncherPhantom.Views
 {
@@ -247,8 +246,6 @@ namespace LauncherPhantom.Views
                 button.Background = brush;
                 button.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(HoverTextColor));
                 brush.BeginAnimation(SolidColorBrush.ColorProperty, bgAnim);
-
-                Debug.WriteLine($"[DashboardPage] Botón presionado: {button.Name}");
             }
             catch (Exception ex)
             {

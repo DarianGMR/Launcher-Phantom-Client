@@ -68,7 +68,7 @@ namespace LauncherPhantom.Managers
                 var newVersion = new Version(versionInfo.Version);
 
                 bool hasUpdate = newVersion > currentVersion;
-                Debug.WriteLine($"[UPDATE] Versión actual: {currentVersion}, Nueva: {newVersion}, Tiene update: {hasUpdate}");
+                Debug.WriteLine($"[UPDATE] Versión actual: {currentVersion}, Nueva: {newVersion}");
                 
                 return (hasUpdate, versionInfo);
             }
@@ -93,7 +93,6 @@ namespace LauncherPhantom.Managers
                 if (!Directory.Exists(updateFolder))
                 {
                     Directory.CreateDirectory(updateFolder);
-                    Debug.WriteLine($"[UPDATE] Carpeta de actualización creada: {updateFolder}");
                 }
 
                 var fileName = Path.GetFileName(new Uri(versionInfo.DownloadUrl).AbsolutePath);
@@ -134,7 +133,7 @@ namespace LauncherPhantom.Managers
                     long totalRead = 0;
                     var lastProgressUpdate = DateTime.Now;
                     var lastProgressBytes = 0L;
-                    var progressUpdateInterval = 250; // Actualizar cada 250ms para precisión en tiempo real
+                    var progressUpdateInterval = 500; // Actualizar cada 500ms para precisión en tiempo real
 
                     do
                     {
@@ -159,7 +158,6 @@ namespace LauncherPhantom.Managers
                                 lastProgressUpdate = now;
                                 lastProgressBytes = totalRead;
 
-                                Debug.WriteLine($"[UPDATE] Progreso: {percentage}% ({totalRead}/{totalBytes} bytes)");
                             }
                         }
                     } while (isMoreToRead);
@@ -177,7 +175,6 @@ namespace LauncherPhantom.Managers
                     throw new Exception("El archivo descargado está vacío o no existe");
                 }
 
-                Debug.WriteLine($"[UPDATE] Descarga completada exitosamente: {filePath}");
                 return filePath;
             }
             catch (OperationCanceledException)
@@ -224,34 +221,6 @@ namespace LauncherPhantom.Managers
             finally
             {
                 response?.Dispose();
-            }
-        }
-
-        public void ApplyUpdate(string installerPath)
-        {
-            try
-            {
-                Debug.WriteLine($"[UPDATE] Aplicando actualización: {installerPath}");
-                
-                if (!File.Exists(installerPath))
-                {
-                    throw new FileNotFoundException($"Archivo de actualización no encontrado: {installerPath}");
-                }
-
-                var processInfo = new ProcessStartInfo
-                {
-                    FileName = installerPath,
-                    UseShellExecute = true,
-                    Verb = "runas"
-                };
-
-                Process.Start(processInfo);
-                System.Windows.Application.Current.Shutdown();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[UPDATE] Error en ApplyUpdate: {ex.Message}");
-                throw new Exception($"Error aplicando actualización: {ex.Message}");
             }
         }
 

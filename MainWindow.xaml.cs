@@ -1,7 +1,6 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -12,7 +11,6 @@ namespace LauncherPhantom
 {
     public partial class MainWindow : Window
     {
-        private RotateTransform? _spinnerRotate;
         private const int LoginWidth = 640;
         private const int LoginHeight = 480;
         private const int DashboardWidth = 1220;
@@ -61,9 +59,7 @@ namespace LauncherPhantom
         private async Task InitializeAsync()
         {
             try
-            {
-                Debug.WriteLine("[MainWindow] Iniciando InitializeAsync...");
-                
+            {                
                 // Show splash screen
                 Debug.WriteLine("[MainWindow] Mostrando Splash Screen...");
                 SplashScreen.Visibility = Visibility.Visible;
@@ -102,9 +98,7 @@ namespace LauncherPhantom
                 SplashScreen.BeginAnimation(UIElement.OpacityProperty, fadeOutAnim);
                 
                 await Task.Delay(500);
-                
-                Debug.WriteLine("[MainWindow] Splash Screen completado");
-                
+                                
                 // Hide splash and show main frame
                 SplashScreen.Visibility = Visibility.Collapsed;
                 MainFrame.Visibility = Visibility.Visible;
@@ -117,9 +111,7 @@ namespace LauncherPhantom
                 // Navigate to login
                 Debug.WriteLine("[MainWindow] Navegando a LoginPage...");
                 NavigateTo(new LoginPage());
-                
-                Debug.WriteLine("[MainWindow] InitializeAsync completado");
-            }
+                            }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[MainWindow] ERROR: {ex.Message}");
@@ -135,39 +127,6 @@ namespace LauncherPhantom
                     MessageBoxImage.Error
                 );
             }
-        }
-
-        public void ShowLoading(bool show)
-        {
-            try
-            {
-                if (show)
-                {
-                    LoadingOverlay.Visibility = Visibility.Visible;
-                    AnimateLoading();
-                }
-                else
-                {
-                    LoadingOverlay.Visibility = Visibility.Collapsed;
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[MainWindow] Error en ShowLoading: {ex.Message}");
-            }
-        }
-
-        private void AnimateLoading()
-        {
-            _spinnerRotate = new RotateTransform();
-            LoadingSpinner.RenderTransform = _spinnerRotate;
-            LoadingSpinner.RenderTransformOrigin = new Point(0.5, 0.5);
-
-            var rotateAnim = new DoubleAnimation(0, 360, TimeSpan.FromSeconds(2))
-            {
-                RepeatBehavior = RepeatBehavior.Forever
-            };
-            _spinnerRotate.BeginAnimation(RotateTransform.AngleProperty, rotateAnim);
         }
 
         public void NavigateTo(Page page)
@@ -200,9 +159,7 @@ namespace LauncherPhantom
                         MainFrame.BeginAnimation(UIElement.OpacityProperty, fadeInAnim);
                     });
                 });
-                
-                Debug.WriteLine($"[MainWindow] Navegación exitosa a {page.GetType().Name}");
-            }
+                            }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[MainWindow] Error al navegar: {ex.Message}");

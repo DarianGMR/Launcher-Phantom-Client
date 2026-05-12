@@ -50,9 +50,7 @@ namespace LauncherPhantom.Views
         private async Task CheckForUpdatesAsync()
         {
             try
-            {
-                Debug.WriteLine("[UpdateCheckSplash] Iniciando verificación de actualizaciones...");
-                
+            {                
                 // Mostrar barra grande de carga y mensaje inicial
                 AnimateLoadingBar();
                 StatusMessageText.Text = "Conectando con el servidor...";
@@ -72,13 +70,13 @@ namespace LauncherPhantom.Views
 
                 if (!hasUpdate || versionInfo == null)
                 {
-                    Debug.WriteLine("[UpdateCheckSplash] No hay actualización disponible");
+                    Debug.WriteLine("[UPDATE] No hay actualización disponible");
                     await ShowStatusMessageAsync("Ya tienes la última actualización!");
                     await ShowNoUpdateFoundAsync();
                     return;
                 }
 
-                Debug.WriteLine("[UpdateCheckSplash] Actualización disponible");
+                Debug.WriteLine("[UPDATE] Actualización disponible");
                 await ShowUpdateAvailableAsync(versionInfo);
             }
             catch (Exception ex)

@@ -47,7 +47,6 @@ namespace LauncherPhantom.Managers
                 }
 
                 _configPath = Path.Combine(_appDataPath, "config.json");
-                Debug.WriteLine($"[ConfigManager] Config path: {_configPath}");
             }
             catch (Exception ex)
             {
@@ -74,7 +73,7 @@ namespace LauncherPhantom.Managers
                     {
                         { "server_url", "http://localhost:5000" },
                         { "language", "es" },
-                        { "theme", "dark" }
+                        { "theme", "dark" },
                     };
                     SaveConfig();
                 }
@@ -109,7 +108,6 @@ namespace LauncherPhantom.Managers
             {
                 _config[key] = value;
                 SaveConfig();
-                Debug.WriteLine($"[ConfigManager] Set: {key}");
             }
             catch (Exception ex)
             {
@@ -123,7 +121,6 @@ namespace LauncherPhantom.Managers
             {
                 _config.Remove(key);
                 SaveConfig();
-                Debug.WriteLine($"[ConfigManager] Deleted: {key}");
             }
             catch (Exception ex)
             {
@@ -137,7 +134,6 @@ namespace LauncherPhantom.Managers
             {
                 var json = JsonConvert.SerializeObject(_config, Formatting.Indented);
                 File.WriteAllText(_configPath, json);
-                Debug.WriteLine($"[ConfigManager] Config guardada en {_configPath}");
             }
             catch (Exception ex)
             {

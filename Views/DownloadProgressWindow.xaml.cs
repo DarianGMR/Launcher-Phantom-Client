@@ -85,7 +85,7 @@ namespace LauncherPhantom.Views
                 _isDownloading = false;
                 ProgressBar.Value = 100;
                 PercentageText.Text = "100%";
-                StatusText.Text = "¡Descarga completada! Preparando actualización...";
+                StatusText.Text = "¡Descarga completada!";
                 CancelDownloadButton.IsEnabled = false;
                 CancelDownloadButton.Content = "Cerrando...";
 
@@ -285,12 +285,10 @@ namespace LauncherPhantom.Views
                 if (_isDownloading && _cancelRequested == false)
                 {
                     e.Cancel = true;
-                    Debug.WriteLine("[DOWNLOAD] Cierre de ventana bloqueado - Descarga en progreso");
                 }
                 
                 _cancellationTokenSource?.Dispose();
                 
-                Debug.WriteLine("[DOWNLOAD] Ventana cerrada");
             }
             catch (Exception ex)
             {

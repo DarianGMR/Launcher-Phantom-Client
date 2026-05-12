@@ -15,14 +15,11 @@ namespace LauncherPhantom
                 ConfigManager.Instance.LoadConfig();
                 
                 DatabaseManager.Instance.Initialize();
-                
-                Debug.WriteLine("[APP] Managers inicializados correctamente");
-                
+                                
                 // Create main window
                 MainWindow = new MainWindow();
                 MainWindow.Show();
                 
-                Debug.WriteLine("[APP] Launcher iniciado correctamente");
             }
             catch (Exception ex)
             {

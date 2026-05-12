@@ -82,11 +82,11 @@ namespace LauncherPhantom.Managers
                 
                 if (isSuccess)
                 {
-                    Debug.WriteLine($"[SERVER] ✓ Conexión OK");
+                    Debug.WriteLine($"[SERVER] Conexión OK");
                 }
                 else
                 {
-                    Debug.WriteLine($"[SERVER] ✗ Conexión fallida ({response.StatusCode})");
+                    Debug.WriteLine($"[SERVER] Conexión fallida ({response.StatusCode})");
                 }
                 
                 return isSuccess;
@@ -111,9 +111,7 @@ namespace LauncherPhantom.Managers
         public async Task<VersionInfo?> GetVersionAsync()
         {
             try
-            {
-                Debug.WriteLine("[SERVER] Leyendo información de actualización desde /api/launcher/version (update.json)");
-                
+            {                
                 var response = await _httpClient.GetAsync($"{_serverUrl}/api/launcher/version");
                 var content = await response.Content.ReadAsStringAsync();
                                 
@@ -146,8 +144,6 @@ namespace LauncherPhantom.Managers
                                 versionInfo.Changes = changesToken.ToString();
                             }
                         }
-
-                        Debug.WriteLine($"[SERVER] ✓ Versión obtenida: {versionInfo.Version}");
                         return versionInfo;
                     }
                     catch (JsonException)
