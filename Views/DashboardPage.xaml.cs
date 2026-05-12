@@ -1,6 +1,8 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using LauncherPhantom.Managers;
@@ -13,6 +15,11 @@ namespace LauncherPhantom.Views
         private System.Timers.Timer? _connectionTimer;
         private bool _isMonitoring = true;
         private bool _isTransitioning = false;
+        private Page? _currentPage;
+        private Button? _lastPressedButton;
+        private const string ActiveButtonColor = "#1A2050";
+        private const string HoverTextColor = "#00D9FF";
+        private const string DefaultTextColor = "#A0A0A0";
 
         public DashboardPage()
         {
@@ -31,25 +38,19 @@ namespace LauncherPhantom.Views
         private async void DashboardPage_Loaded(object sender, RoutedEventArgs e)
         {
             try
-            {                
-                // Obtener usuario
-                var username = ConfigManager.Instance.GetSetting("current_username");
-                if (!string.IsNullOrEmpty(username))
-                {
-                    WelcomeText.Text = $"Bienvenido, {username}";
-                }
+            {
+                Debug.WriteLine("[DashboardPage] Inicializando Dashboard...");
                 
-                // Actualizar versión
-                VersionText.Text = Constants.AppVersion;
-                
-                // Iniciar monitoreo de conexión INMEDIATAMENTE
                 _isMonitoring = true;
                 _isTransitioning = false;
                 
                 StartConnectionMonitoring();
-                
-                // Hacer verificación inicial inmediatamente
                 await VerifyConnectionAsync();
+                
+                NavigateToPage(new BibliotecaPage(), "BIBLIOTECA");
+                SetButtonPressed(BibliotecaButton);
+                
+                Debug.WriteLine("[DashboardPage] Dashboard completamente inicializado");
             }
             catch (Exception ex)
             {
@@ -69,18 +70,16 @@ namespace LauncherPhantom.Views
                 return;
 
             try
-            {                
+            {
                 var isConnected = await ServerManager.Instance.TestConnectionAsync();
-                                
+                
                 if (!isConnected)
                 {
-                    Debug.WriteLine("[DashboardPage] ✗ CONEXIÓN PERDIDA - Retornando a Login");
+                    Debug.WriteLine("[DashboardPage] ✗ CONEXIÓN PERDIDA");
                     await HandleConnectionLoss();
                     return;
                 }
 
-                UpdateConnectionStatus(true);
-                Debug.WriteLine("[DashboardPage] ✓ Conexión verificada correctamente");
             }
             catch (Exception ex)
             {
@@ -92,10 +91,7 @@ namespace LauncherPhantom.Views
         private async Task HandleConnectionLoss()
         {
             if (_isTransitioning)
-            {
-                Debug.WriteLine("[DashboardPage] Ya en transición, ignorando...");
                 return;
-            }
 
             try
             {
@@ -103,57 +99,19 @@ namespace LauncherPhantom.Views
                 _isMonitoring = false;
                 StopConnectionMonitoring();
                 
-                Debug.WriteLine("[DashboardPage] Guardando error de conexión...");
-                // Guardar el estado de error para mostrarlo en LoginPage
-                ConfigManager.Instance.SetSetting("connection_error", "Se a perdido la conexion con el servidor.");
+                ConfigManager.Instance.SetSetting("connection_error", "Se ha perdido la conexión con el servidor.");
                 
-                // Usar Dispatcher para navegar (asegura que se ejecute en el thread principal)
                 await Dispatcher.InvokeAsync(() =>
                 {
-                    try
+                    if (Window.GetWindow(this) is MainWindow mainWindow)
                     {
-                        Debug.WriteLine("[DashboardPage] Navegando a LoginPage...");
-                        ReturnToLogin();
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"[DashboardPage] Error en Dispatcher: {ex.Message}");
+                        mainWindow.NavigateTo(new LoginPage());
                     }
                 });
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[DashboardPage] Error en HandleConnectionLoss: {ex.Message}");
-                Debug.WriteLine($"[DashboardPage] StackTrace: {ex.StackTrace}");
-            }
-        }
-
-        private void UpdateConnectionStatus(bool isConnected)
-        {
-            try
-            {
-                if (isConnected)
-                {
-                    ServerStatusText.Text = "Conectado";
-                    ServerStatusText.Foreground = new System.Windows.Media.SolidColorBrush(
-                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#00FF00"));
-                    ConnectionStatus.Text = "Conectado al servidor";
-                    ConnectionStatus.Foreground = new System.Windows.Media.SolidColorBrush(
-                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#00FF00"));
-                }
-                else
-                {
-                    ServerStatusText.Text = "Desconectado";
-                    ServerStatusText.Foreground = new System.Windows.Media.SolidColorBrush(
-                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF3333"));
-                    ConnectionStatus.Text = "Conexión perdida";
-                    ConnectionStatus.Foreground = new System.Windows.Media.SolidColorBrush(
-                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FF3333"));
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[DashboardPage] Error actualizando estado: {ex.Message}");
             }
         }
 
@@ -163,39 +121,25 @@ namespace LauncherPhantom.Views
             {
                 StopConnectionMonitoring();
                 
-                Debug.WriteLine("[DashboardPage] Iniciando monitoreo de conexión (intervalo: 5s)");
-                // Verificar conexión cada 5 segundos
+                Debug.WriteLine("[DashboardPage] Iniciando monitoreo de conexión");
                 _connectionTimer = new System.Timers.Timer(5000);
-                _connectionTimer.Elapsed += (s, e) =>
+                _connectionTimer.Elapsed += async (s, e) =>
                 {
                     if (!_isMonitoring || _isTransitioning)
-                    {
                         return;
-                    }
 
                     try
-                    {                        
-                        _ = Task.Run(async () =>
+                    {
+                        var isConnected = await ServerManager.Instance.TestConnectionAsync();
+                        
+                        if (!isConnected && _isMonitoring && !_isTransitioning)
                         {
-                            try
-                            {
-                                var isConnected = await ServerManager.Instance.TestConnectionAsync();
-                                
-                                if (!isConnected && _isMonitoring && !_isTransitioning)
-                                {
-                                    Debug.WriteLine("[DashboardPage] [TIMER] Conexión perdida detectada");
-                                    await HandleConnectionLoss();
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine($"[DashboardPage] [TIMER] Error en verificación: {ex.Message}");
-                            }
-                        });
+                            await HandleConnectionLoss();
+                        }
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"[DashboardPage] [TIMER] Error general: {ex.Message}");
+                        Debug.WriteLine($"[DashboardPage] Error en timer: {ex.Message}");
                     }
                 };
                 
@@ -205,52 +149,6 @@ namespace LauncherPhantom.Views
             catch (Exception ex)
             {
                 Debug.WriteLine($"[DashboardPage] Error iniciando monitoreo: {ex.Message}");
-            }
-        }
-
-        private void LogoutButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                Debug.WriteLine("[DashboardPage] Logout iniciado por el usuario");
-                
-                _isMonitoring = false;
-                _isTransitioning = true;
-                StopConnectionMonitoring();
-                
-                ConfigManager.Instance.DeleteSetting("jwt_token");
-                ConfigManager.Instance.DeleteSetting("current_username");
-                ConfigManager.Instance.DeleteSetting("connection_error");
-                
-                ReturnToLogin();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[DashboardPage] Error en LogoutButton_Click: {ex.Message}");
-                MessageBox.Show($"Error al cerrar sesión: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void ReturnToLogin()
-        {
-            try
-            {
-                _isMonitoring = false;
-                StopConnectionMonitoring();
-                
-                if (Window.GetWindow(this) is MainWindow mainWindow)
-                {
-                    mainWindow.NavigateTo(new LoginPage());
-                }
-                else
-                {
-                    Debug.WriteLine("[DashboardPage] MainWindow no encontrada");
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[DashboardPage] Error regresando a login: {ex.Message}");
-                Debug.WriteLine($"[DashboardPage] StackTrace: {ex.StackTrace}");
             }
         }
 
@@ -269,6 +167,141 @@ namespace LauncherPhantom.Views
             {
                 Debug.WriteLine($"[DashboardPage] Error deteniendo monitoreo: {ex.Message}");
             }
+        }
+
+        private void NavigateToPage(Page page, string title)
+        {
+            try
+            {
+                _currentPage = page;
+                PageTitle.Text = title;
+                
+                ContentFrame.Opacity = 1;
+                var fadeOutAnim = new DoubleAnimation(1.0, 0.0, TimeSpan.FromMilliseconds(200));
+                
+                fadeOutAnim.Completed += (s, e) =>
+                {
+                    try
+                    {
+                        ContentFrame.Navigate(page);
+                        var fadeInAnim = new DoubleAnimation(0.0, 1.0, TimeSpan.FromMilliseconds(300));
+                        ContentFrame.BeginAnimation(UIElement.OpacityProperty, fadeInAnim);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[DashboardPage] Error en animación: {ex.Message}");
+                    }
+                };
+                
+                ContentFrame.BeginAnimation(UIElement.OpacityProperty, fadeOutAnim);
+                Debug.WriteLine($"[DashboardPage] Navegado a: {title}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[DashboardPage] Error navegando: {ex.Message}");
+                MessageBox.Show($"Error al navegar: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void NavButton_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (sender is Button btn && btn != _lastPressedButton)
+            {
+                // Mostrar fondo azul en hover
+                btn.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(ActiveButtonColor));
+                btn.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(HoverTextColor));
+            }
+        }
+
+        private void NavButton_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (sender is Button btn && btn != _lastPressedButton)
+            {
+                // Volver a estado normal si no está presionado
+                btn.Background = new SolidColorBrush(Colors.Transparent);
+                btn.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultTextColor));
+            }
+        }
+
+        private void SetButtonPressed(Button button)
+        {
+            try
+            {
+                // Resetear botón anterior
+                if (_lastPressedButton != null && _lastPressedButton != button)
+                {
+                    _lastPressedButton.Background = new SolidColorBrush(Colors.Transparent);
+                    _lastPressedButton.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(DefaultTextColor));
+                }
+
+                // Establecer nuevo botón presionado con animación
+                _lastPressedButton = button;
+                
+                // Animación: blanco a azul
+                var bgAnim = new ColorAnimation(
+                    Colors.White, 
+                    (Color)ColorConverter.ConvertFromString(ActiveButtonColor), 
+                    TimeSpan.FromMilliseconds(300));
+                
+                var brush = new SolidColorBrush(Colors.White);
+                button.Background = brush;
+                button.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(HoverTextColor));
+                brush.BeginAnimation(SolidColorBrush.ColorProperty, bgAnim);
+
+                Debug.WriteLine($"[DashboardPage] Botón presionado: {button.Name}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[DashboardPage] Error en SetButtonPressed: {ex.Message}");
+            }
+        }
+
+        private void BibliotecaButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetButtonPressed(BibliotecaButton);
+            NavigateToPage(new BibliotecaPage(), "BIBLIOTECA");
+        }
+
+        private void CatalogoButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetButtonPressed(CatalogoButton);
+            NavigateToPage(new CatalogoPage(), "CATÁLOGO DE JUEGOS");
+        }
+
+        private void NoticiasButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetButtonPressed(NoticiasButton);
+            NavigateToPage(new NoticiasPage(), "NOTICIAS");
+        }
+
+        private void CreditsButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetButtonPressed(CreditsButton);
+            NavigateToPage(new CreditsPage(), "CRÉDITOS");
+        }
+
+        private void WebButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "http://example.com",
+                    UseShellExecute = true
+                });
+                Debug.WriteLine("[DashboardPage] Abriendo navegador a http://example.com");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[DashboardPage] Error abriendo web: {ex.Message}");
+                MessageBox.Show("No se pudo abrir el navegador", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ProfileButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetButtonPressed(ProfileButton);
+            NavigateToPage(new ProfilePage(), "PERFIL");
         }
     }
 }
