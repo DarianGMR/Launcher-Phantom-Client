@@ -20,7 +20,7 @@
                     </Border.Effect>
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                            <TextBlock Text="[05-05-2026]" Foreground="#00D9FF" FontSize="11" FontWeight="Bold"/>
+                            <TextBlock Text="[12-05-2026]" Foreground="#00D9FF" FontSize="11" FontWeight="Bold"/>
                             <TextBlock Text="Actualización del Launcher v0.2.0" Foreground="#FFFFFF" FontSize="13" FontWeight="Bold" Margin="10,0,0,0"/>
                         </StackPanel>
                         <TextBlock Text="Se ha liberado una nueva versión del launcher con nuevo dashboard rediseñado con todo el contenido, BIBLIOTECA: En desarollo, CATALOGO DE JUEGOS: En desarrollo, WEB: Completo, NOTICIAS: Completo, CREDITOS: Completo, PERFIL: En desarrollo. Toda la UI del dashboard esta echa con animaciones fluidas y multiples funciones." 
