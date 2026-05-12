@@ -7,13 +7,10 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>LauncherPhantom</AssemblyName>
     <RootNamespace>LauncherPhantom</RootNamespace>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>DarianGMR</Authors>
     <Description>Launcher Phantom - Game Launcher Client</Description>
     <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
-    <PublishAot>false</PublishAot>
-    <PublishTrimmed>false</PublishTrimmed>
-    <PublishReadyToRun>false</PublishReadyToRun>
     <Nullable>enable</Nullable>
     <LangVersion>12</LangVersion>
     <ApplicationIcon>Resources\Images\icon.ico</ApplicationIcon>
@@ -26,12 +23,18 @@
     <PackageReference Include="TagLibSharp" Version="2.2.0" />
   </ItemGroup>
 
+  <!-- Incluir todas las imágenes como recursos incrustados -->
   <ItemGroup>
-    <EmbeddedResource Include="Resources/**/*" />
+    <Resource Include="Resources/Images/icon.ico" />
+    <Resource Include="Resources/Images/Catalogo/battlefield3.png" />
+    <Resource Include="Resources/Images/Catalogo/minecraft.png" />
+    <Resource Include="Resources/Images/Catalogo/rust.png" />
+    <Resource Include="Resources/Images/Catalogo/hurtworld.png" />
+    <Resource Include="Resources/Images/Catalogo/default.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources/Images/icon.ico" />
+    <EmbeddedResource Include="Resources/**/*" />
   </ItemGroup>
 
 </Project>
